@@ -1,0 +1,85 @@
+.card input::placeholder {
+  font-style: italic;
+  color: #bbb;
+}
+
+.card {
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+}
+
+
+/* ========== CONTENEDOR GENERAL ========== */
+.login-container {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* ========== CARD ========== */
+.card-login {
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  background-color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-login:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.15);
+}
+
+/* ========== ICONO Y TITULOS ========== */
+.card-login .icono-login {
+  font-size: 3rem;
+  color: #0d6efd;
+}
+
+.card-login h4 {
+  font-weight: 700;
+}
+
+.card-login p {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* ========== INPUTS ========== */
+.card-login .form-control {
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+.card-login .form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.25);
+}
+
+.card-login input::placeholder {
+  font-style: italic;
+  color: #adb5bd;
+}
+
+/* ========== BOTÓN ========== */
+.card-login .btn-primary {
+  border-radius: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem;
+}
+
+.card-login .btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* ========== ALERTA ========== */
+.card-login .alert {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+/* ========== FOOTER ========== */
+.card-login .login-footer {
+  font-size: 0.75rem;
+  color: #adb5bd;
+}

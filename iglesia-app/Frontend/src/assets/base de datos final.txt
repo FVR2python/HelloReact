@@ -1,0 +1,356 @@
+-- CREACIÓN COMPLETA Y ORDENADA DE LA BASE DE DATOS: turismo_bd
+-- Versión final corregida con AUTO_INCREMENT (ACTUALIZADA)
+
+CREATE DATABASE IF NOT EXISTS turismo_bd;
+USE turismo_bd;
+
+-- Tabla: tipos_docs
+CREATE TABLE tipos_docs (
+  idtipos_docs INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_doc VARCHAR(45) NOT NULL
+);
+
+-- Tabla: personas
+CREATE TABLE personas (
+  idpersonas INT AUTO_INCREMENT PRIMARY KEY,
+  nombres VARCHAR(20) NOT NULL,
+  apellido1 VARCHAR(25) NOT NULL,
+  apellido2 VARCHAR(25),
+  telefono VARCHAR(9) NOT NULL,
+  correo VARCHAR(45) NOT NULL,
+  idtipos_docs INT NOT NULL,
+  nrodoc VARCHAR(12) NOT NULL,
+  FOREIGN KEY (idtipos_docs) REFERENCES tipos_docs(idtipos_docs)
+);
+
+-- Tabla: razones_sociales
+CREATE TABLE razones_sociales (
+  idrazonsocial INT AUTO_INCREMENT PRIMARY KEY,
+  nomrazon VARCHAR(50) NOT NULL,
+  abreviatura VARCHAR(45) NOT NULL
+);
+
+-- Tabla: empresas
+CREATE TABLE empresas (
+  idempresas INT AUTO_INCREMENT PRIMARY KEY,
+  nomenpresa VARCHAR(50) NOT NULL,
+  ruc VARCHAR(11) NOT NULL,
+  celempresa VARCHAR(9) NOT NULL,
+  dirempresa VARCHAR(50) NOT NULL,
+  giro TEXT NOT NULL,
+  idrazonsocial INT NOT NULL,
+  FOREIGN KEY (idrazonsocial) REFERENCES razones_sociales(idrazonsocial)
+);
+
+-- Tabla: tipos_clientes
+CREATE TABLE tipos_clientes (
+  idtipos_clientes INT AUTO_INCREMENT PRIMARY KEY,
+  nombretip VARCHAR(8) NOT NULL
+);
+
+-- Tabla: clientes
+CREATE TABLE clientes (
+  idclientes INT AUTO_INCREMENT PRIMARY KEY,
+  nacionalidad VARCHAR(30) NOT NULL,
+  idtipos_clientes INT NOT NULL,
+  idpersonas INT,
+  idempresas INT,
+  FOREIGN KEY (idtipos_clientes) REFERENCES tipos_clientes(idtipos_clientes),
+  FOREIGN KEY (idpersonas) REFERENCES personas(idpersonas),
+  FOREIGN KEY (idempresas) REFERENCES empresas(idempresas)
+);
+
+-- Tabla: estados_reservas
+CREATE TABLE estados_reservas (
+  idestados_reservas INT AUTO_INCREMENT PRIMARY KEY,
+  nomestado VARCHAR(10) NOT NULL
+);
+
+-- Tabla: niveles_dificultades
+CREATE TABLE niveles_dificultades (
+  idniveles_dificultades INT AUTO_INCREMENT PRIMARY KEY,
+  nomdicultad VARCHAR(20) NOT NULL
+);
+
+-- Tabla: tipos_paquetes
+CREATE TABLE tipos_paquetes (
+  idtipos_paquetes INT AUTO_INCREMENT PRIMARY KEY,
+  nomtipo VARCHAR(15) NOT NULL
+);
+
+-- Tabla: duraciones_paquetes
+CREATE TABLE duraciones_paquetes (
+  idduraciones_paquetes INT AUTO_INCREMENT PRIMARY KEY,
+  nombredur VARCHAR(30) NOT NULL,
+  nrodias INT NOT NULL,
+  nronoches INT NOT NULL
+);
+
+-- Tabla: temporadas
+CREATE TABLE temporadas (
+  idtemporadas INT AUTO_INCREMENT PRIMARY KEY,
+  meses TEXT NOT NULL
+);
+
+-- Tabla: estados_paquetes
+CREATE TABLE estados_paquetes (
+  idestados_paquetes INT AUTO_INCREMENT PRIMARY KEY,
+  tipoesta VARCHAR(15) NOT NULL
+);
+
+-- Tabla: temporadas_paquetes
+CREATE TABLE temporadas_paquetes (
+  idtempradas_paquetes INT AUTO_INCREMENT PRIMARY KEY,
+  idtemporadas INT NOT NULL,
+  idestados_paquetes INT NOT NULL,
+  condicionestemp TEXT NOT NULL,
+  FOREIGN KEY (idtemporadas) REFERENCES temporadas(idtemporadas),
+  FOREIGN KEY (idestados_paquetes) REFERENCES estados_paquetes(idestados_paquetes)
+);
+
+-- Tabla: paquetes
+CREATE TABLE paquetes (
+  idpaquetes INT AUTO_INCREMENT PRIMARY KEY,
+  nompaquete TEXT NOT NULL,
+  descpaquete TEXT NOT NULL,
+  preciopaquete DECIMAL(10,2) NOT NULL,
+  idniveles_dificultades INT NOT NULL,
+  idtipos_paquetes INT NOT NULL,
+  idduraciones_paquetes INT NOT NULL,
+  idtempradas_paquetes INT NOT NULL,
+  FOREIGN KEY (idniveles_dificultades) REFERENCES niveles_dificultades(idniveles_dificultades),
+  FOREIGN KEY (idtipos_paquetes) REFERENCES tipos_paquetes(idtipos_paquetes),
+  FOREIGN KEY (idduraciones_paquetes) REFERENCES duraciones_paquetes(idduraciones_paquetes),
+  FOREIGN KEY (idtempradas_paquetes) REFERENCES temporadas_paquetes(idtempradas_paquetes)
+);
+
+-- Tabla: reservas
+CREATE TABLE reservas (
+  idreservas INT AUTO_INCREMENT PRIMARY KEY,
+  cantidadper INT NOT NULL,
+  fechareser DATE NOT NULL,
+  fechaviaje DATE NOT NULL,
+  codigoventa VARCHAR(45) NOT NULL,
+  idclientes INT NOT NULL,
+  idestados_reservas INT NOT NULL,
+  adelanto DECIMAL(10,2) NOT NULL,
+  idpaquetes INT NOT NULL,
+  FOREIGN KEY (idclientes) REFERENCES clientes(idclientes),
+  FOREIGN KEY (idestados_reservas) REFERENCES estados_reservas(idestados_reservas),
+  FOREIGN KEY (idpaquetes) REFERENCES paquetes(idpaquetes)
+);
+
+-- Tabla nueva: reservas_transportes (sin fechas redundantes)
+CREATE TABLE reservas_transportes (
+  idreservas_transportes INT AUTO_INCREMENT PRIMARY KEY,
+  idreservas INT NOT NULL,
+  idtransportes INT NOT NULL,
+  cantidad_ocupada INT NOT NULL,
+  FOREIGN KEY (idreservas) REFERENCES reservas(idreservas),
+  FOREIGN KEY (idtransportes) REFERENCES transportes(idtransportes)
+);
+
+-- Tabla: estados_colaboradores
+CREATE TABLE estados_colaboradores (
+  idestados_colaboradores INT AUTO_INCREMENT PRIMARY KEY,
+  nomtipo VARCHAR(45) NOT NULL
+);
+
+-- Tabla: roles_colaboradores
+CREATE TABLE roles_colaboradores (
+  idroles INT AUTO_INCREMENT PRIMARY KEY,
+  nomroles VARCHAR(40) NOT NULL
+);
+
+-- Tabla: colaboradores
+CREATE TABLE colaboradores (
+  idcolaboradores INT AUTO_INCREMENT PRIMARY KEY,
+  direccion VARCHAR(50) NOT NULL,
+  idpersonas INT NOT NULL,
+  idestados_colaboradores INT NOT NULL,
+  idroles INT NOT NULL,
+  FOREIGN KEY (idpersonas) REFERENCES personas(idpersonas),
+  FOREIGN KEY (idestados_colaboradores) REFERENCES estados_colaboradores(idestados_colaboradores),
+  FOREIGN KEY (idroles) REFERENCES roles_colaboradores(idroles)
+);
+
+-- Tabla: usuarios
+CREATE TABLE usuarios (
+  idusuarios INT AUTO_INCREMENT PRIMARY KEY,
+  nomusuario VARCHAR(30) NOT NULL,
+  contra BLOB NOT NULL,
+  idcolaboradores INT NOT NULL,
+  FOREIGN KEY (idcolaboradores) REFERENCES colaboradores(idcolaboradores)
+);
+
+-- Tabla: contratos
+CREATE TABLE contratos (
+  idcontratos INT AUTO_INCREMENT PRIMARY KEY,
+  fechain DATE NOT NULL,
+  fechafin DATE NOT NULL,
+  sueldo DECIMAL(10,2) NOT NULL,
+  condiciones TEXT NOT NULL,
+  idcolaboradores INT NOT NULL,
+  FOREIGN KEY (idcolaboradores) REFERENCES colaboradores(idcolaboradores)
+);
+
+-- Tabla: tipos_servicios
+CREATE TABLE tipos_servicios (
+  idtipos_servicios INT AUTO_INCREMENT PRIMARY KEY,
+  nomservicio VARCHAR(30) NOT NULL
+);
+
+-- Tabla: estados_proveedores
+CREATE TABLE estados_proveedores (
+  idestados_proveedores INT AUTO_INCREMENT PRIMARY KEY,
+  nomesta VARCHAR(10) NOT NULL
+);
+
+-- Tabla: proveedores
+CREATE TABLE proveedores (
+  idproveedores INT AUTO_INCREMENT PRIMARY KEY,
+  detalleprov TEXT NOT NULL,
+  idtipos_servicios INT NOT NULL,
+  idestados_proveedores INT NOT NULL,
+  idempresas INT NOT NULL,
+  FOREIGN KEY (idtipos_servicios) REFERENCES tipos_servicios(idtipos_servicios),
+  FOREIGN KEY (idestados_proveedores) REFERENCES estados_proveedores(idestados_proveedores),
+  FOREIGN KEY (idempresas) REFERENCES empresas(idempresas)
+);
+
+-- Tabla: estados_transportes
+CREATE TABLE estados_transportes (
+  idestados_trasportes INT AUTO_INCREMENT PRIMARY KEY,
+  nomesta VARCHAR(20) NOT NULL
+);
+
+-- Tabla: transportes
+CREATE TABLE transportes (
+  idtransportes INT AUTO_INCREMENT PRIMARY KEY,
+  placa VARCHAR(7) NOT NULL,
+  marca VARCHAR(50) NOT NULL,
+  modelo VARCHAR(50) NOT NULL,
+  capacidad INT NOT NULL,
+  fecharevi DATE NOT NULL,
+  costotrans DECIMAL(10,2) NOT NULL,
+  obsertrans TEXT NOT NULL,
+  idestados_trasportes INT NOT NULL,
+  idproveedores INT NOT NULL,
+  FOREIGN KEY (idestados_trasportes) REFERENCES estados_transportes(idestados_trasportes),
+  FOREIGN KEY (idproveedores) REFERENCES proveedores(idproveedores)
+);
+
+-- Tabla: categorias_servicios
+CREATE TABLE categorias_servicios (
+  idcat_servicios INT AUTO_INCREMENT PRIMARY KEY,
+  catservi VARCHAR(30) NOT NULL
+);
+
+-- Tabla: servicios
+CREATE TABLE servicios (
+  idservicios INT AUTO_INCREMENT PRIMARY KEY,
+  nomproduc VARCHAR(50) NOT NULL,
+  desproduc TEXT NOT NULL,
+  stock INT NOT NULL,
+  precioreferencial DECIMAL(10,2) NOT NULL,
+  idcat_servicios INT NOT NULL,
+  idproveedores INT NOT NULL,
+  FOREIGN KEY (idcat_servicios) REFERENCES categorias_servicios(idcat_servicios),
+  FOREIGN KEY (idproveedores) REFERENCES proveedores(idproveedores)
+);
+
+-- Tabla: itinerarios
+CREATE TABLE itinerarios (
+  iditinerarios INT AUTO_INCREMENT PRIMARY KEY,
+  numdia INT NOT NULL,
+  horaini TIME NOT NULL,
+  horafin TIME NOT NULL,
+  actividades TEXT NOT NULL,
+  ptencuentro TEXT NOT NULL,
+  destino TEXT NOT NULL,
+  idpaquetes INT NOT NULL,
+  FOREIGN KEY (idpaquetes) REFERENCES paquetes(idpaquetes)
+);
+
+-- Tabla: paquetes_servicios
+CREATE TABLE paquetes_servicios (
+  paquete_servicio INT AUTO_INCREMENT PRIMARY KEY,
+  idpaquetes INT NOT NULL,
+  idservicios INT NOT NULL,
+  cantproduc INT NOT NULL,
+  incluido TINYINT(1) NOT NULL,
+  FOREIGN KEY (idpaquetes) REFERENCES paquetes(idpaquetes),
+  FOREIGN KEY (idservicios) REFERENCES servicios(idservicios)
+);
+
+-- Tabla: paquetes_transportes
+CREATE TABLE paquetes_transportes (
+  idpaquetes_transportes INT AUTO_INCREMENT PRIMARY KEY,
+  idtransportes INT NOT NULL,
+  idpaquetes INT NOT NULL,
+  incluyetrans TINYINT(1) NOT NULL,
+  FOREIGN KEY (idtransportes) REFERENCES transportes(idtransportes),
+  FOREIGN KEY (idpaquetes) REFERENCES paquetes(idpaquetes)
+);
+
+-- Tabla: metodos_pagos
+CREATE TABLE metodos_pagos (
+  idmetodos_pagos INT AUTO_INCREMENT PRIMARY KEY,
+  tipometodo VARCHAR(20) NOT NULL
+);
+
+-- Tabla: estados_pagos
+CREATE TABLE estados_pagos (
+  idestados_pagos INT AUTO_INCREMENT PRIMARY KEY,
+  nompagoesta VARCHAR(30) NOT NULL
+);
+
+-- Tabla: ventas
+CREATE TABLE ventas (
+  idventas INT AUTO_INCREMENT PRIMARY KEY,
+  codigo_venta VARCHAR(30) NOT NULL,
+  fechaventa DATE NOT NULL,
+  subtotalventa DECIMAL(10,2) NOT NULL,
+  igv DECIMAL(10,2) NOT NULL,
+  restantepago DECIMAL(10,2) NOT NULL,
+  descuento DECIMAL(10,2) NOT NULL,
+  pagofinal DECIMAL(10,2) NOT NULL,
+  idmetodos_pagos INT NOT NULL,
+  idreservas INT NOT NULL,
+  idcolaboradores INT NOT NULL,
+  idestados_pagos INT NOT NULL,
+  FOREIGN KEY (idmetodos_pagos) REFERENCES metodos_pagos(idmetodos_pagos),
+  FOREIGN KEY (idreservas) REFERENCES reservas(idreservas),
+  FOREIGN KEY (idcolaboradores) REFERENCES colaboradores(idcolaboradores),
+  FOREIGN KEY (idestados_pagos) REFERENCES estados_pagos(idestados_pagos)
+);
+
+-- Tabla: detalles_ventas
+CREATE TABLE detalles_ventas (
+  iddetalles_ventas INT AUTO_INCREMENT PRIMARY KEY,
+  preciounitario DECIMAL(10,2) NOT NULL,
+  cantidad INT NOT NULL,
+  subtotalservi DECIMAL(10,2) NOT NULL,
+  idservicios INT NOT NULL,
+  idventas INT NOT NULL,
+  FOREIGN KEY (idservicios) REFERENCES servicios(idservicios),
+  FOREIGN KEY (idventas) REFERENCES ventas(idventas)
+);
+
+-- Tabla: funciones
+CREATE TABLE funciones (
+  idfunciones INT AUTO_INCREMENT PRIMARY KEY,
+  tiposfunciones VARCHAR(45) NOT NULL
+);
+
+-- Tabla: reservas_colaboradores
+CREATE TABLE reservas_colaboradores (
+  idreservas_colaboradores INT AUTO_INCREMENT PRIMARY KEY,
+  idcolaboradores INT NOT NULL,
+  idreservas INT NOT NULL,
+  idfunciones INT NOT NULL,
+  FOREIGN KEY (idcolaboradores) REFERENCES colaboradores(idcolaboradores),
+  FOREIGN KEY (idreservas) REFERENCES reservas(idreservas),
+  FOREIGN KEY (idfunciones) REFERENCES funciones(idfunciones)
+);
+

@@ -1,0 +1,188 @@
+/* Fondo general del área principal */
+.app-content {
+  background-color: #eef6fb; /* Celeste muy suave */
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+body.bg-dark .app-content {
+  background-color: #121212; /* Fondo oscuro real */
+}
+
+/* Panel principal */
+.content-panel {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  max-width: 1300px;
+  margin: 0 auto;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+body.bg-dark .content-panel {
+  background-color: #1f1f1f !important;
+  border-color: #333;
+  color: #ddd;
+}
+
+/* Título del panel */
+.content-panel > h2,
+.content-panel > h4 {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+  color: #007bff;
+}
+
+body.bg-dark .content-panel > h2,
+body.bg-dark .content-panel > h4 {
+  border-color: #339cff;
+  color: #339cff;
+}
+
+/* Formulario */
+.content-panel form {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+  margin-bottom: 2rem;
+}
+
+body.bg-dark .content-panel form {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+/* Inputs y selects */
+.content-panel input,
+.content-panel select,
+.content-panel textarea {
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+}
+
+body.bg-dark .content-panel input,
+body.bg-dark .content-panel select,
+body.bg-dark .content-panel textarea {
+  background-color: #333;
+  color: #ddd;
+  border-color: #555;
+}
+
+/* Tabla */
+.content-panel .table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.content-panel .table th {
+  background-color: #007bff;
+  color: #fff;
+}
+
+body.bg-dark .content-panel .table {
+  background-color: #2a2a2a;
+}
+
+body.bg-dark .content-panel .table th {
+  background-color: #339cff;
+  color: #fff;
+}
+
+/* Botones */
+.content-panel button {
+  min-width: 100px;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.content-panel button:hover {
+  filter: brightness(0.95);
+}
+
+/* Mejor espaciado en los formularios */
+.content-panel form .form-control,
+.content-panel form .form-select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.content-panel form .form-label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+/* Mejora de inputs y selects */
+.content-panel input:focus,
+.content-panel select:focus,
+.content-panel textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+body.bg-dark .content-panel input:focus,
+body.bg-dark .content-panel select:focus,
+body.bg-dark .content-panel textarea:focus {
+  border-color: #339cff;
+  box-shadow: 0 0 0 0.2rem rgba(51, 156, 255, 0.25);
+}
+
+/* Botones más definidos */
+.content-panel .btn {
+  border-radius: 0.375rem;
+  padding: 0.4rem 1rem;
+}
+
+.content-panel .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.content-panel .btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.content-panel .btn-outline-primary:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.content-panel .btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Tablas */
+.content-panel .table td,
+.content-panel .table th {
+  vertical-align: middle;
+  padding: 0.6rem;
+}
+
+.content-panel .table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+body.bg-dark .content-panel .table-hover tbody tr:hover {
+  background-color: rgba(51, 156, 255, 0.1);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .content-panel {
+    padding: 1rem;
+  }
+
+  .content-panel form {
+    padding: 1rem;
+  }
+}
+
+
+

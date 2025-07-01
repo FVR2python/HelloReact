@@ -42,7 +42,7 @@ CORS(app)
 # Registrar blueprints
 app.register_blueprint(login_bp)
 app.register_blueprint(usuarios_bp)
-app.register_blueprint(cargos_bp, url_prefix='/api')
+app.register_blueprint(cargos_bp)
 app.register_blueprint(roles_bp)
 app.register_blueprint(personas_roles_bp)
 app.register_blueprint(clerigos_bp)

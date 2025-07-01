@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
 
-
-
 function PerfilUsuario({ usuario }) {
   const [persona, setPersona] = useState(null);
   const [detallesCargo, setDetallesCargo] = useState(null);
@@ -12,12 +10,12 @@ function PerfilUsuario({ usuario }) {
 
     const obtenerDatos = async () => {
       try {
-        const resPersona = await fetch(`http://localhost:5000/api/personas/${usuario.id_persona}`);
+        const resPersona = await fetch(`http://localhost:5000/personas/${usuario.id_persona}`);
         if (!resPersona.ok) throw new Error("Error al obtener datos de la persona");
         const dataPersona = await resPersona.json();
         setPersona(dataPersona);
 
-        const resCargo = await fetch(`http://localhost:5000/api/perfil/cargo/${usuario.id_cargo}/persona/${usuario.id_persona}`);
+        const resCargo = await fetch(`http://localhost:5000/perfil/cargo/${usuario.id_cargo}/persona/${usuario.id_persona}`);
         if (!resCargo.ok) throw new Error("Error al obtener detalles del cargo");
         const dataCargo = await resCargo.json();
         setDetallesCargo(dataCargo);
@@ -46,48 +44,43 @@ function PerfilUsuario({ usuario }) {
 
   const editarPerfil = () => alert('Función para editar perfil próximamente');
   const cambiarContrasena = () => alert('Función para cambiar contraseña próximamente');
- 
 
- const generarPDF = () => {
-  const doc = new jsPDF();
+  const generarPDF = () => {
+    const doc = new jsPDF();
 
-  // Título centrado
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text("Perfil de Usuario", 105, 20, null, null, "center");
-
-  // Línea decorativa
-  doc.setLineWidth(0.5);
-  doc.line(20, 25, 190, 25);
-
-  // Cuerpo del contenido
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-
-  let y = 35;
-  const espacio = 10;
-
-  const campos = [
-    ["Nombre:", `${persona.nombres} ${persona.apellido1} ${persona.apellido2}`],
-    ["DNI:", persona.dni],
-    ["Email:", persona.email],
-    ["Teléfono:", persona.telefono],
-    ["Dirección:", persona.direccion],
-    ["Cargo:", usuario.nombre_cargo],
-    ["Edad:", `${calcularEdad(persona.fecha_nacimiento)} años`],
-  ];
-
-  campos.forEach(([label, valor]) => {
+    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text(label, 20, y);
+    doc.text("Perfil de Usuario", 105, 20, null, null, "center");
+
+    doc.setLineWidth(0.5);
+    doc.line(20, 25, 190, 25);
+
+    doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
-    doc.text(String(valor), 60, y);
-    y += espacio;
-  });
 
-  doc.save(`Perfil_${persona.nombres}.pdf`);
-};
+    let y = 35;
+    const espacio = 10;
 
+    const campos = [
+      ["Nombre:", `${persona.nombres} ${persona.apellido1} ${persona.apellido2}`],
+      ["DNI:", persona.dni],
+      ["Email:", persona.email],
+      ["Teléfono:", persona.telefono],
+      ["Dirección:", persona.direccion],
+      ["Cargo:", usuario.nombre_cargo],
+      ["Edad:", `${calcularEdad(persona.fecha_nacimiento)} años`],
+    ];
+
+    campos.forEach(([label, valor]) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(label, 20, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(String(valor), 60, y);
+      y += espacio;
+    });
+
+    doc.save(`Perfil_${persona.nombres}.pdf`);
+  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">

@@ -11,13 +11,13 @@ def manejar_error_sql(e, mensaje_base="Error en la operación"):
     return jsonify({"mensaje": f"{mensaje_base}: {msg}"}), 500
 
 def validar_campos_obligatorios(data, campos):
-    faltantes = [campo for campo in data if campo not in data or not str(data[campo]).strip()]
+    faltantes = [campo for campo in campos if campo not in data or not str(data[campo]).strip()]
     return faltantes
 
-# ========= Rutas =========
+# ========= Rutas sin /api =========
 
 # GET - Listar personas activas
-@personas_bp.route('/api/personas', methods=['GET'])
+@personas_bp.route('/personas', methods=['GET'])
 def listar_personas():
     try:
         conn = get_connection()
@@ -31,7 +31,7 @@ def listar_personas():
         return manejar_error_sql(e, "Error al listar personas")
 
 # GET - Obtener persona por ID
-@personas_bp.route('/api/personas/<int:id_persona>', methods=['GET'])
+@personas_bp.route('/personas/<int:id_persona>', methods=['GET'])
 def obtener_persona(id_persona):
     try:
         conn = get_connection()
@@ -47,7 +47,7 @@ def obtener_persona(id_persona):
         return manejar_error_sql(e, "Error al obtener persona")
 
 # POST - Crear nueva persona
-@personas_bp.route('/api/personas', methods=['POST'])
+@personas_bp.route('/personas', methods=['POST'])
 def crear_persona():
     data = request.get_json()
     campos_obligatorios = ['dni', 'nombres', 'apellido1', 'fecha_nacimiento', 'telefono']
@@ -72,7 +72,6 @@ def crear_persona():
         conn.commit()
         id_generado = cursor.lastrowid
 
-        # Traer persona recién insertada
         cursor.execute("SELECT * FROM personas WHERE id_persona = %s", (id_generado,))
         nueva_persona = cursor.fetchone()
 
@@ -83,7 +82,7 @@ def crear_persona():
         return manejar_error_sql(e, "Error al registrar persona")
 
 # PUT - Actualizar persona
-@personas_bp.route('/api/personas/<int:id_persona>', methods=['PUT'])
+@personas_bp.route('/personas/<int:id_persona>', methods=['PUT'])
 def actualizar_persona(id_persona):
     data = request.get_json()
     campos_obligatorios = ['dni', 'nombres', 'apellido1', 'fecha_nacimiento', 'telefono']
@@ -94,8 +93,6 @@ def actualizar_persona(id_persona):
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-
-        # Verificar si el DNI o correo ya está usado por otra persona
         cursor.execute("""
             SELECT id_persona FROM personas 
             WHERE (dni = %s OR email = %s) AND id_persona != %s
@@ -123,8 +120,8 @@ def actualizar_persona(id_persona):
     except Exception as e:
         return manejar_error_sql(e, "Error al actualizar persona")
 
-# DELETE - Desactivar persona (Soft delete)
-@personas_bp.route('/api/personas/<int:id_persona>', methods=['DELETE'])
+# DELETE - Desactivar persona
+@personas_bp.route('/personas/<int:id_persona>', methods=['DELETE'])
 def eliminar_persona(id_persona):
     try:
         conn = get_connection()

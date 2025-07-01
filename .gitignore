@@ -1,0 +1,21 @@
+# Node (React)
+node_modules/
+dist/
+.env
+*.log
+
+# Python (Flask backend)
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+instance/
+.env
+
+# IDEs y basura
+.vscode/
+.idea/
+.DS_Store
+
+# Otros
+build/

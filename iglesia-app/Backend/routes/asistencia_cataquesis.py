@@ -69,3 +69,22 @@ def eliminar_asistencia(id_asistencia):
         return jsonify({"mensaje": "Asistencia eliminada correctamente"})
     except Exception as e:
         return jsonify({"mensaje": f"Error al eliminar asistencia: {str(e)}"}), 500
+
+# ✅ NUEVO ENDPOINT: Obtener catequizandos
+@asistencia_bp.route('/catequizandos', methods=['GET'])
+def obtener_catequizandos():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT DISTINCT p.id_persona, p.nombres, p.apellido1, p.apellido2
+            FROM personas p
+            JOIN personas_roles pr ON p.id_persona = pr.id_persona
+            WHERE pr.tipo_contexto = 'grupo_catequesis'
+        """)
+        catequizandos = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify(catequizandos)
+    except Exception as e:
+        return jsonify({'mensaje': f'Error al obtener catequizandos: {str(e)}'}), 500

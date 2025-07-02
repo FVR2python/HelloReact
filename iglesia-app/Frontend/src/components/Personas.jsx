@@ -20,9 +20,19 @@ function Personas() {
   }, []);
 
   const obtenerPersonas = async () => {
-    const res = await fetch('http://localhost:5000/personas');
-    const data = await res.json();
-    setPersonas(data);
+    try {
+      const res = await fetch('http://localhost:5000/personas');
+      const data = await res.json();
+      console.log('Datos recibidos:', data);
+      if (Array.isArray(data)) {
+        setPersonas(data);
+      } else {
+        throw new Error('Respuesta inesperada del servidor');
+      }
+    } catch (error) {
+      console.error('Error al obtener personas:', error);
+      Swal.fire('Error', 'No se pudieron cargar las personas', 'error');
+    }
   };
 
   const handleChange = (e) => {
@@ -36,29 +46,33 @@ function Personas() {
       : 'http://localhost:5000/personas';
     const method = editando ? 'PUT' : 'POST';
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      Swal.fire('Éxito', data.mensaje, 'success');
-      setFormData({
-        dni: '',
-        nombres: '',
-        apellido1: '',
-        apellido2: '',
-        email: '',
-        fecha_nacimiento: '',
-        direccion: '',
-        telefono: ''
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
-      setEditando(null);
-      obtenerPersonas();
-    } else {
-      Swal.fire('Error', data.mensaje, 'error');
+      const data = await res.json();
+      if (res.ok) {
+        Swal.fire('Éxito', data.mensaje, 'success');
+        setFormData({
+          dni: '',
+          nombres: '',
+          apellido1: '',
+          apellido2: '',
+          email: '',
+          fecha_nacimiento: '',
+          direccion: '',
+          telefono: ''
+        });
+        setEditando(null);
+        obtenerPersonas();
+      } else {
+        Swal.fire('Error', data.mensaje, 'error');
+      }
+    } catch (error) {
+      console.error('Error al guardar persona:', error);
+      Swal.fire('Error', 'Hubo un problema al guardar la persona', 'error');
     }
   };
 
@@ -78,15 +92,20 @@ function Personas() {
     });
 
     if (confirm.isConfirmed) {
-      const res = await fetch(`http://localhost:5000/personas/${id}`, {
-        method: 'DELETE'
-      });
-      const data = await res.json();
-      if (res.ok) {
-        Swal.fire('Eliminado', data.mensaje, 'success');
-        obtenerPersonas();
-      } else {
-        Swal.fire('Error', data.mensaje, 'error');
+      try {
+        const res = await fetch(`http://localhost:5000/personas/${id}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (res.ok) {
+          Swal.fire('Eliminado', data.mensaje, 'success');
+          obtenerPersonas();
+        } else {
+          Swal.fire('Error', data.mensaje, 'error');
+        }
+      } catch (error) {
+        console.error('Error al eliminar persona:', error);
+        Swal.fire('Error', 'No se pudo eliminar la persona', 'error');
       }
     }
   };
@@ -99,38 +118,14 @@ function Personas() {
           {editando ? '✏️ Editar persona' : '➕ Registrar nueva persona'}
         </h2>
 
-        <div>
-          <label className="label-form">DNI *</label>
-          <input name="dni" value={formData.dni} onChange={handleChange} className="input-form" required />
-        </div>
-        <div>
-          <label className="label-form">Nombres *</label>
-          <input name="nombres" value={formData.nombres} onChange={handleChange} className="input-form" required />
-        </div>
-        <div>
-          <label className="label-form">Apellido Paterno *</label>
-          <input name="apellido1" value={formData.apellido1} onChange={handleChange} className="input-form" required />
-        </div>
-        <div>
-          <label className="label-form">Apellido Materno</label>
-          <input name="apellido2" value={formData.apellido2} onChange={handleChange} className="input-form" />
-        </div>
-        <div>
-          <label className="label-form">Correo electrónico</label>
-          <input name="email" type="email" value={formData.email} onChange={handleChange} className="input-form" />
-        </div>
-        <div>
-          <label className="label-form">Fecha de nacimiento *</label>
-          <input name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleChange} className="input-form" required />
-        </div>
-        <div>
-          <label className="label-form">Dirección</label>
-          <input name="direccion" value={formData.direccion} onChange={handleChange} className="input-form" />
-        </div>
-        <div>
-          <label className="label-form">Teléfono *</label>
-          <input name="telefono" value={formData.telefono} onChange={handleChange} className="input-form" required />
-        </div>
+        <input name="dni" value={formData.dni} onChange={handleChange} placeholder="DNI *" className="input-form" required />
+        <input name="nombres" value={formData.nombres} onChange={handleChange} placeholder="Nombres *" className="input-form" required />
+        <input name="apellido1" value={formData.apellido1} onChange={handleChange} placeholder="Apellido Paterno *" className="input-form" required />
+        <input name="apellido2" value={formData.apellido2} onChange={handleChange} placeholder="Apellido Materno" className="input-form" />
+        <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Correo electrónico" className="input-form" />
+        <input name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleChange} placeholder="Fecha de nacimiento *" className="input-form" required />
+        <input name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="input-form" />
+        <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono *" className="input-form" required />
 
         <div className="md:col-span-3 flex justify-end gap-3 mt-2">
           <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
@@ -175,31 +170,32 @@ function Personas() {
             </tr>
           </thead>
           <tbody>
-            {personas.map((p) => (
-              <tr key={p.id_persona} className="hover:bg-gray-100">
-                <td className="table-td">{p.dni}</td>
-                <td className="table-td">{`${p.nombres} ${p.apellido1} ${p.apellido2}`}</td>
-                <td className="table-td">
-                  {new Date(p.fecha_nacimiento).toLocaleDateString('es-PE', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                  })}
-                </td>
-                <td className="table-td">{p.telefono}</td>
-                <td className="table-td">{p.email}</td>
-                <td className="table-td">{p.direccion}</td>
-                <td className="table-td flex items-center justify-center gap-2">
-                  <button onClick={() => handleEditar(p)} className="text-blue-600 hover:text-blue-800 text-lg">
-                    <i className="bi bi-pencil-square"></i>
-                  </button>
-                  <button onClick={() => handleEliminar(p.id_persona)} className="text-red-600 hover:text-red-800 text-lg">
-                    <i className="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {personas.length === 0 && (
+            {Array.isArray(personas) && personas.length > 0 ? (
+              personas.map((p) => (
+                <tr key={p.id_persona} className="hover:bg-gray-100">
+                  <td className="table-td">{p.dni}</td>
+                  <td className="table-td">{`${p.nombres} ${p.apellido1} ${p.apellido2}`}</td>
+                  <td className="table-td">
+                    {new Date(p.fecha_nacimiento).toLocaleDateString('es-PE', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    })}
+                  </td>
+                  <td className="table-td">{p.telefono}</td>
+                  <td className="table-td">{p.email}</td>
+                  <td className="table-td">{p.direccion}</td>
+                  <td className="table-td flex items-center justify-center gap-2">
+                    <button onClick={() => handleEditar(p)} className="text-blue-600 hover:text-blue-800 text-lg">
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                    <button onClick={() => handleEliminar(p.id_persona)} className="text-red-600 hover:text-red-800 text-lg">
+                      <i className="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td colSpan="7" className="text-center py-4 text-gray-500">
                   No hay personas registradas

@@ -24,10 +24,34 @@ function InscripcionesSacramentales() {
     obtenerPersonas();
   }, []);
 
+  // ✅ Evalúa mostrar campo de evaluación oral
   useEffect(() => {
-    const sacramentoSeleccionado = sacramentos.find(s => s.id_sacramento === formData.id_sacramento);
-    const nombre = sacramentoSeleccionado?.nombre_sacrament?.toLowerCase();
-    setMostrarEvaluacionOral(nombre === 'confirmación' || nombre === 'primera comunión');
+    if (!formData.id_sacramento || sacramentos.length === 0) {
+      setMostrarEvaluacionOral(false);
+      return;
+    }
+
+    const sacramentoSeleccionado = sacramentos.find(
+      s => String(s.id_sacramento) === String(formData.id_sacramento)
+    );
+
+    if (!sacramentoSeleccionado) {
+      setMostrarEvaluacionOral(false);
+      return;
+    }
+
+    const normalizar = (texto) =>
+      texto
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const nombreNormalizado = normalizar(sacramentoSeleccionado.nombre_sacrament);
+    const sacramentosConEvaluacion = ['confirmacion', 'primera comunion', 'bautizo'];
+
+    setMostrarEvaluacionOral(sacramentosConEvaluacion.includes(nombreNormalizado));
   }, [formData.id_sacramento, sacramentos]);
 
   const obtenerInscripciones = async () => {
@@ -70,15 +94,15 @@ function InscripcionesSacramentales() {
   };
 
   const formatFechaBonita = (fecha) => {
-    if (!fecha) return 'Sin evaluación oral';
+    if (!fecha || fecha === 'Sin evaluación oral') return 'Sin evaluación oral';
     const date = new Date(fecha);
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!formData.id_persona || !formData.id_sacramento) {
-      Swal.fire('Campos requeridos', 'Seleccione persona y sacramento', 'warning');
+    if (!formData.id_persona || !formData.id_sacramento || !formData.fecha_ceremonia_acordada) {
+      Swal.fire('Campos requeridos', 'Debe completar persona, sacramento y fecha de ceremonia', 'warning');
       return;
     }
 
@@ -86,7 +110,7 @@ function InscripcionesSacramentales() {
       ...formData,
       fecha_matricula: formatFecha(formData.fecha_matricula),
       fecha_ceremonia_acordada: formatFecha(formData.fecha_ceremonia_acordada),
-      evaluacion_oral: mostrarEvaluacionOral ? formatFecha(formData.evaluacion_oral) : null
+      evaluacion_oral: mostrarEvaluacionOral ? formatFecha(formData.evaluacion_oral) : 'Sin evaluación oral'
     };
 
     const url = editando ? `http://localhost:5000/inscripciones/${editando}` : 'http://localhost:5000/inscripciones';
@@ -130,7 +154,7 @@ function InscripcionesSacramentales() {
       id_persona: i.id_persona,
       fecha_matricula: i.fecha_matricula?.replace(' ', 'T') || '',
       fecha_ceremonia_acordada: i.fecha_ceremonia_acordada?.replace(' ', 'T') || '',
-      evaluacion_oral: i.evaluacion_oral?.replace(' ', 'T') || '',
+      evaluacion_oral: i.evaluacion_oral === 'Sin evaluación oral' ? '' : i.evaluacion_oral?.replace(' ', 'T') || '',
       descripcion: i.descripcion,
       id_sacramento: i.id_sacramento,
       estado_matricula: i.estado_matricula
@@ -161,10 +185,9 @@ function InscripcionesSacramentales() {
         Swal.fire('Error', 'Error en la conexión', 'error');
       }
     }
-  }
+  };
 
-
-   return (
+  return (
     <div className="max-w-7xl mx-auto p-6">
       <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center">Gestión de Inscripciones Sacramentales</h2>
 
@@ -172,8 +195,8 @@ function InscripcionesSacramentales() {
         {/* Persona */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Persona</label>
-          <select name="id_persona" value={formData.id_persona || ''} onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          <select name="id_persona" value={formData.id_persona || ''} onChange={handleChange} required
+            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">Seleccione persona</option>
             {personas.map(p => (
               <option key={p.id_persona} value={p.id_persona}>
@@ -194,10 +217,11 @@ function InscripcionesSacramentales() {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Fecha Ceremonia</label>
           <input type="datetime-local" name="fecha_ceremonia_acordada" value={formData.fecha_ceremonia_acordada || ''} onChange={handleChange}
+            required
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
 
-        {/* Evaluación Oral (solo si aplica) */}
+        {/* Evaluación Oral */}
         {mostrarEvaluacionOral && (
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Evaluación Oral</label>
@@ -217,8 +241,8 @@ function InscripcionesSacramentales() {
         {/* Sacramento */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Sacramento</label>
-          <select name="id_sacramento" value={formData.id_sacramento || ''} onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          <select name="id_sacramento" value={formData.id_sacramento || ''} onChange={handleChange} required
+            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">Seleccione sacramento</option>
             {sacramentos.map(s => (
               <option key={s.id_sacramento} value={s.id_sacramento}>
@@ -238,7 +262,7 @@ function InscripcionesSacramentales() {
           </select>
         </div>
 
-        {/* Botón registrar */}
+        {/* Botón */}
         <div className="md:col-span-2 lg:col-span-3 flex justify-end pt-2">
           <button type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition text-sm shadow-md">
@@ -247,7 +271,7 @@ function InscripcionesSacramentales() {
         </div>
       </form>
 
-      {/* Tabla de resultados */}
+      {/* Tabla */}
       <div className="bg-white shadow-md rounded-xl overflow-x-auto">
         <table className="min-w-full text-sm text-left border-separate border-spacing-y-1">
           <thead className="bg-blue-600 text-white">
@@ -273,7 +297,7 @@ function InscripcionesSacramentales() {
                 </td>
                 <td className="p-3">{i.fecha_matricula}</td>
                 <td className="p-3">{i.fecha_ceremonia_acordada}</td>
-                <td className="p-3">{i.evaluacion_oral ? formatFechaBonita(i.evaluacion_oral) : <span className="text-gray-400 italic">Sin evaluación oral</span>}</td>
+                <td className="p-3">{formatFechaBonita(i.evaluacion_oral)}</td>
                 <td className="p-3 text-center">
                   <button onClick={() => handleEditar(i)} className="text-blue-600 hover:underline mr-2">Editar</button>
                   <button onClick={() => handleEliminar(i.id_inscripcion)} className="text-red-600 hover:underline">Eliminar</button>
@@ -290,6 +314,5 @@ function InscripcionesSacramentales() {
     </div>
   );
 }
-
 
 export default InscripcionesSacramentales;

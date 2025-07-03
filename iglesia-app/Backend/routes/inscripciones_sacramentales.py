@@ -12,14 +12,26 @@ def listar_inscripciones():
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT i.id_inscripcion, i.estado_matricula, i.fecha_matricula, 
-                   i.fecha_ceremonia_acordada, i.evaluacion_oral, i.descripcion,
-                   p.id_persona, p.dni, p.nombres, p.apellido1, p.apellido2, 
-                   p.email, p.telefono, p.fecha_nacimiento, p.direccion,
-                   s.id_sacramento, s.nombre_sacrament
+            SELECT 
+                i.id_inscripcion, i.estado_matricula, i.fecha_matricula, 
+                i.fecha_ceremonia_acordada, i.evaluacion_oral, i.descripcion,
+
+                CONCAT(p.nombres, ' ', p.apellido1, ' ', IFNULL(p.apellido2, '')) AS nombre_persona,
+                s.nombre_sacrament AS nombre_sacramento,
+
+                p.id_persona, p.dni, p.nombres, p.apellido1, p.apellido2, 
+                p.email, p.telefono, p.fecha_nacimiento, p.direccion,
+                s.id_sacramento,
+
+                dm.tipo_matrimonio, dm.padrino, dm.madrina, dm.observaciones,
+                CONCAT(pc.nombres, ' ', pc.apellido1, ' ', pc.apellido2) AS conyuge_nombres,
+                dm.id_conyuge
+
             FROM inscripciones_sacramentales i
             JOIN personas p ON i.id_persona = p.id_persona
             JOIN sacramentos s ON i.id_sacramento = s.id_sacramento
+            LEFT JOIN datos_matrimonio dm ON i.id_inscripcion = dm.id_inscripcion
+            LEFT JOIN personas pc ON dm.id_conyuge = pc.id_persona
         """)
         data = cursor.fetchall()
         cursor.close()
@@ -49,7 +61,7 @@ def obtener_personas_combo():
         return jsonify({"mensaje": f"Error al obtener personas: {str(e)}"}), 500
 
 # =====================
-# REGISTRAR INSCRIPCIÓN
+# REGISTRAR INSCRIPCIÓN (+ matrimonio si aplica)
 # =====================
 @inscripciones_bp.route('/inscripciones', methods=['POST'])
 def registrar_inscripcion():
@@ -76,17 +88,35 @@ def registrar_inscripcion():
             data['id_sacramento']
         ))
 
+        id_inscripcion = cursor.lastrowid
+
+        # Si es matrimonio, guarda en datos_matrimonio
+        if data.get('id_conyuge'):
+            cursor.execute("""
+                INSERT INTO datos_matrimonio 
+                (id_inscripcion, id_conyuge, tipo_matrimonio, padrino, madrina, observaciones)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (
+                id_inscripcion,
+                data['id_conyuge'],
+                data.get('tipo_matrimonio'),
+                data.get('padrino'),
+                data.get('madrina'),
+                data.get('observaciones_matrimonio')
+            ))
+
         conn.commit()
         cursor.close()
         conn.close()
-        return jsonify({"mensaje": "Inscripción registrada correctamente"}), 201
+
+        return jsonify({"mensaje": "Inscripción registrada correctamente", "id_inscripcion": id_inscripcion}), 201
 
     except Exception as e:
         return jsonify({"mensaje": f"Error al registrar inscripción: {str(e)}"}), 500
 
-# =====================
+# ===========================
 # ACTUALIZAR INSCRIPCIÓN
-# =====================
+# ===========================
 @inscripciones_bp.route('/inscripciones/<int:id_inscripcion>', methods=['PUT'])
 def actualizar_inscripcion(id_inscripcion):
     data = request.get_json()
@@ -122,9 +152,9 @@ def actualizar_inscripcion(id_inscripcion):
     except Exception as e:
         return jsonify({"mensaje": f"Error al actualizar inscripción: {str(e)}"}), 500
 
-# =====================
+# ===========================
 # ELIMINAR INSCRIPCIÓN
-# =====================
+# ===========================
 @inscripciones_bp.route('/inscripciones/<int:id_inscripcion>', methods=['DELETE'])
 def eliminar_inscripcion(id_inscripcion):
     try:
@@ -137,3 +167,34 @@ def eliminar_inscripcion(id_inscripcion):
         return jsonify({"mensaje": "Inscripción eliminada correctamente"})
     except Exception as e:
         return jsonify({"mensaje": f"Error al eliminar inscripción: {str(e)}"}), 500
+
+# ===========================
+# REGISTRAR DATOS MATRIMONIO (opcional si no se hizo en POST /inscripciones)
+# ===========================
+@inscripciones_bp.route('/datos_matrimonio', methods=['POST'])
+def registrar_datos_matrimonio():
+    data = request.get_json()
+    try:
+        if not data.get('id_inscripcion') or not data.get('id_conyuge'):
+            return jsonify({"mensaje": "Faltan campos requeridos"}), 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO datos_matrimonio 
+            (id_inscripcion, id_conyuge, tipo_matrimonio, padrino, madrina, observaciones)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (
+            data['id_inscripcion'],
+            data['id_conyuge'],
+            data.get('tipo_matrimonio'),
+            data.get('padrino'),
+            data.get('madrina'),
+            data.get('observaciones')
+        ))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"mensaje": "Datos de matrimonio registrados correctamente"}), 201
+    except Exception as e:
+        return jsonify({"mensaje": f"Error al registrar datos de matrimonio: {str(e)}"}), 500

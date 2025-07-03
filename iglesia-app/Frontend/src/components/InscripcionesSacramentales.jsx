@@ -7,6 +7,7 @@ function InscripcionesSacramentales() {
   const [personas, setPersonas] = useState([]);
   const [editando, setEditando] = useState(null);
   const [mostrarEvaluacionOral, setMostrarEvaluacionOral] = useState(false);
+  const [esMatrimonio, setEsMatrimonio] = useState(false);
 
   const [formData, setFormData] = useState({
     id_persona: '',
@@ -14,8 +15,13 @@ function InscripcionesSacramentales() {
     fecha_ceremonia_acordada: '',
     evaluacion_oral: '',
     descripcion: '',
+    estado_matricula: 1,
+    tipo_matrimonio: '',
+    padrino: '',
+    madrina: '',
+    observaciones_matrimonio: '',
     id_sacramento: '',
-    estado_matricula: 1
+    id_conyuge: ''
   });
 
   useEffect(() => {
@@ -24,10 +30,10 @@ function InscripcionesSacramentales() {
     obtenerPersonas();
   }, []);
 
-  // ✅ Evalúa mostrar campo de evaluación oral
   useEffect(() => {
     if (!formData.id_sacramento || sacramentos.length === 0) {
       setMostrarEvaluacionOral(false);
+      setEsMatrimonio(false);
       return;
     }
 
@@ -37,21 +43,20 @@ function InscripcionesSacramentales() {
 
     if (!sacramentoSeleccionado) {
       setMostrarEvaluacionOral(false);
+      setEsMatrimonio(false);
       return;
     }
 
-    const normalizar = (texto) =>
-      texto
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
+    const nombre = sacramentoSeleccionado.nombre_sacrament
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
 
-    const nombreNormalizado = normalizar(sacramentoSeleccionado.nombre_sacrament);
     const sacramentosConEvaluacion = ['confirmacion', 'primera comunion', 'bautizo'];
 
-    setMostrarEvaluacionOral(sacramentosConEvaluacion.includes(nombreNormalizado));
+    setMostrarEvaluacionOral(sacramentosConEvaluacion.includes(nombre));
+    setEsMatrimonio(nombre === 'matrimonio');
   }, [formData.id_sacramento, sacramentos]);
 
   const obtenerInscripciones = async () => {
@@ -85,7 +90,8 @@ function InscripcionesSacramentales() {
     }
   };
 
-  const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = e =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const formatFecha = (f) => {
     if (!f) return null;
@@ -113,7 +119,10 @@ function InscripcionesSacramentales() {
       evaluacion_oral: mostrarEvaluacionOral ? formatFecha(formData.evaluacion_oral) : 'Sin evaluación oral'
     };
 
-    const url = editando ? `http://localhost:5000/inscripciones/${editando}` : 'http://localhost:5000/inscripciones';
+    const url = editando
+      ? `http://localhost:5000/inscripciones/${editando}`
+      : 'http://localhost:5000/inscripciones';
+
     const method = editando ? 'PUT' : 'POST';
 
     try {
@@ -143,8 +152,13 @@ function InscripcionesSacramentales() {
       fecha_ceremonia_acordada: '',
       evaluacion_oral: '',
       descripcion: '',
+      estado_matricula: 1,
+      tipo_matrimonio: '',
+      padrino: '',
+      madrina: '',
+      observaciones_matrimonio: '',
       id_sacramento: '',
-      estado_matricula: 1
+      id_conyuge: ''
     });
     setEditando(null);
   };
@@ -157,7 +171,12 @@ function InscripcionesSacramentales() {
       evaluacion_oral: i.evaluacion_oral === 'Sin evaluación oral' ? '' : i.evaluacion_oral?.replace(' ', 'T') || '',
       descripcion: i.descripcion,
       id_sacramento: i.id_sacramento,
-      estado_matricula: i.estado_matricula
+      estado_matricula: i.estado_matricula,
+      tipo_matrimonio: i.tipo_matrimonio || '',
+      padrino: i.padrino || '',
+      madrina: i.madrina || '',
+      observaciones_matrimonio: i.observaciones || '',
+      id_conyuge: i.id_conyuge || ''
     });
     setEditando(i.id_inscripcion);
   };
@@ -174,7 +193,10 @@ function InscripcionesSacramentales() {
 
     if (result.isConfirmed) {
       try {
-        const res = await fetch(`http://localhost:5000/inscripciones/${id}`, { method: 'DELETE' });
+        const res = await fetch(`http://localhost:5000/inscripciones/${id}`, {
+          method: 'DELETE'
+        });
+
         if (res.ok) {
           obtenerInscripciones();
           Swal.fire('Eliminado', 'La inscripción fue eliminada', 'success');
@@ -187,16 +209,28 @@ function InscripcionesSacramentales() {
     }
   };
 
-  return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center">Gestión de Inscripciones Sacramentales</h2>
+return (
+  <div className="container mx-auto px-4 py-10">
+    <h2 className="text-3xl font-bold text-blue-800 text-center mb-10">
+      Gestión de Inscripciones Sacramentales
+    </h2>
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-3xl shadow-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    {/* Formulario */}
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-3xl shadow-lg p-8 space-y-6 border border-gray-200"
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Persona */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Persona</label>
-          <select name="id_persona" value={formData.id_persona || ''} onChange={handleChange} required
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label className="block text-sm font-semibold mb-1">Persona</label>
+          <select
+            name="id_persona"
+            value={formData.id_persona || ''}
+            onChange={handleChange}
+            required
+            className="input-form"
+          >
             <option value="">Seleccione persona</option>
             {personas.map(p => (
               <option key={p.id_persona} value={p.id_persona}>
@@ -208,41 +242,66 @@ function InscripcionesSacramentales() {
 
         {/* Fecha Matrícula */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Fecha Matrícula</label>
-          <input type="datetime-local" name="fecha_matricula" value={formData.fecha_matricula || ''} onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <label className="block text-sm font-semibold mb-1">Fecha Matrícula</label>
+          <input
+            type="datetime-local"
+            name="fecha_matricula"
+            value={formData.fecha_matricula || ''}
+            onChange={handleChange}
+            className="input-form"
+          />
         </div>
 
         {/* Fecha Ceremonia */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Fecha Ceremonia</label>
-          <input type="datetime-local" name="fecha_ceremonia_acordada" value={formData.fecha_ceremonia_acordada || ''} onChange={handleChange}
+          <label className="block text-sm font-semibold mb-1">Fecha Ceremonia</label>
+          <input
+            type="datetime-local"
+            name="fecha_ceremonia_acordada"
+            value={formData.fecha_ceremonia_acordada || ''}
+            onChange={handleChange}
             required
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="input-form"
+          />
         </div>
 
         {/* Evaluación Oral */}
         {mostrarEvaluacionOral && (
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Evaluación Oral</label>
-            <input type="datetime-local" name="evaluacion_oral" value={formData.evaluacion_oral || ''} onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold mb-1">Evaluación Oral</label>
+            <input
+              type="datetime-local"
+              name="evaluacion_oral"
+              value={formData.evaluacion_oral || ''}
+              onChange={handleChange}
+              className="input-form"
+            />
           </div>
         )}
 
         {/* Descripción */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
-          <input type="text" name="descripcion" value={formData.descripcion || ''} onChange={handleChange}
-            placeholder="Ingrese una descripción opcional"
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <label className="block text-sm font-semibold mb-1">Descripción</label>
+          <input
+            type="text"
+            name="descripcion"
+            value={formData.descripcion || ''}
+            onChange={handleChange}
+            placeholder="Ingrese una descripción"
+            className="input-form"
+          />
         </div>
 
         {/* Sacramento */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Sacramento</label>
-          <select name="id_sacramento" value={formData.id_sacramento || ''} onChange={handleChange} required
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label className="block text-sm font-semibold mb-1">Sacramento</label>
+          <select
+            name="id_sacramento"
+            value={formData.id_sacramento || ''}
+            onChange={handleChange}
+            required
+            className="input-form"
+          >
             <option value="">Seleccione sacramento</option>
             {sacramentos.map(s => (
               <option key={s.id_sacramento} value={s.id_sacramento}>
@@ -254,65 +313,162 @@ function InscripcionesSacramentales() {
 
         {/* Estado */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Estado</label>
-          <select name="estado_matricula" value={formData.estado_matricula ?? 1} onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label className="block text-sm font-semibold mb-1">Estado</label>
+          <select
+            name="estado_matricula"
+            value={formData.estado_matricula ?? 1}
+            onChange={handleChange}
+            className="input-form"
+          >
             <option value={1}>Activo</option>
             <option value={0}>Inactivo</option>
           </select>
         </div>
-
-        {/* Botón */}
-        <div className="md:col-span-2 lg:col-span-3 flex justify-end pt-2">
-          <button type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition text-sm shadow-md">
-            {editando ? 'Actualizar' : 'Registrar'}
-          </button>
-        </div>
-      </form>
-
-      {/* Tabla */}
-      <div className="bg-white shadow-md rounded-xl overflow-x-auto">
-        <table className="min-w-full text-sm text-left border-separate border-spacing-y-1">
-          <thead className="bg-blue-600 text-white">
-            <tr>
-              <th className="p-3">Apellidos y Nombres</th>
-              <th className="p-3">Sacramento</th>
-              <th className="p-3">Estado</th>
-              <th className="p-3">F. Matrícula</th>
-              <th className="p-3">F. Ceremonia</th>
-              <th className="p-3">Evaluación Oral</th>
-              <th className="p-3 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inscripciones.length > 0 ? inscripciones.map(i => (
-              <tr key={i.id_inscripcion} className="bg-white hover:bg-blue-50 shadow-sm">
-                <td className="p-3">{i.nombres} {i.apellido1} {i.apellido2}</td>
-                <td className="p-3">{i.nombre_sacrament}</td>
-                <td className="p-3">
-                  <span className={`px-2 py-1 text-xs rounded-full font-medium ${i.estado_matricula ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {i.estado_matricula ? 'Activo' : 'Inactivo'}
-                  </span>
-                </td>
-                <td className="p-3">{i.fecha_matricula}</td>
-                <td className="p-3">{i.fecha_ceremonia_acordada}</td>
-                <td className="p-3">{formatFechaBonita(i.evaluacion_oral)}</td>
-                <td className="p-3 text-center">
-                  <button onClick={() => handleEditar(i)} className="text-blue-600 hover:underline mr-2">Editar</button>
-                  <button onClick={() => handleEliminar(i.id_inscripcion)} className="text-red-600 hover:underline">Eliminar</button>
-                </td>
-              </tr>
-            )) : (
-              <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-400">No hay inscripciones registradas</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
       </div>
-    </div>
-  );
-}
 
+      {/* Matrimonio */}
+      {esMatrimonio && (
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-semibold text-blue-700 mb-4">Datos del Matrimonio</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-semibold mb-1">Tipo de Matrimonio</label>
+              <input
+                type="text"
+                name="tipo_matrimonio"
+                value={formData.tipo_matrimonio || ''}
+                onChange={handleChange}
+                className="input-form"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Cónyuge</label>
+              <select
+                name="id_conyuge"
+                value={formData.id_conyuge || ''}
+                onChange={handleChange}
+                className="input-form"
+              >
+                <option value="">Seleccione cónyuge</option>
+                {personas.map(p => (
+                  <option key={p.id_persona} value={p.id_persona}>
+                    {p.nombres} {p.apellido1} {p.apellido2}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Padrino</label>
+              <input
+                type="text"
+                name="padrino"
+                value={formData.padrino || ''}
+                onChange={handleChange}
+                className="input-form"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Madrina</label>
+              <input
+                type="text"
+                name="madrina"
+                value={formData.madrina || ''}
+                onChange={handleChange}
+                className="input-form"
+              />
+            </div>
+            <div className="sm:col-span-2 lg:col-span-3">
+              <label className="block text-sm font-semibold mb-1">Observaciones</label>
+              <textarea
+                name="observaciones_matrimonio"
+                value={formData.observaciones_matrimonio || ''}
+                onChange={handleChange}
+                rows={3}
+                className="input-form"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+<div className="flex justify-end pt-4 space-x-3">
+  {editando && (
+
+    <button
+      type="button"
+      onClick={resetForm}
+      className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-6 py-2 rounded-lg shadow-sm transition text-sm flex items-center gap-1"
+    >
+      <i className="bi bi-x-circle"></i> Cancelar
+    </button>
+  )}
+
+  <button
+    type="submit"
+    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition text-sm flex items-center gap-1"
+  >
+    <i className="bi bi-save"></i> {editando ? 'Actualizar' : 'Registrar'}
+  </button>
+</div>
+ 
+    </form>
+
+    {/* Tabla de inscripciones */}
+    <div className="bg-white mt-12 rounded-xl shadow-md border border-gray-200 overflow-hidden">
+      <table className="w-full table-auto text-sm text-center">
+        <thead className="bg-blue-100 text-blue-800 font-semibold">
+          <tr>
+            <th className="px-4 py-2">Persona</th>
+            <th className="px-4 py-2">Sacramento</th>
+            <th className="px-4 py-2">Ceremonia</th>
+            <th className="px-4 py-2">Estado</th>
+            <th className="px-4 py-2">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {inscripciones.length > 0 ? (
+            inscripciones.map(i => (
+              <tr key={i.id_inscripcion} className="border-t">
+                <td className="px-4 py-2">{i.nombre_persona}</td>
+                <td className="px-4 py-2">{i.nombre_sacramento}</td>
+                <td className="px-4 py-2">{formatFechaBonita(i.fecha_ceremonia_acordada)}</td>
+                <td className="px-4 py-2">{i.estado_matricula ? 'Activo' : 'Inactivo'}</td>
+                <td className="px-4 py-2 flex justify-center gap-2">
+                  <button
+                    onClick={() => handleEditar(i)}
+                    className="btn-icon-edit"
+                    title="Editar"
+                  >
+                    <i className="bi bi-pencil-square"></i>
+                  </button>
+                  <button
+                    onClick={() => handleEliminar(i.id_inscripcion)}
+                    className="btn-icon-delete"
+                    title="Eliminar"
+                  >
+                    <i className="bi bi-trash-fill"></i>
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="px-4 py-4 text-gray-400 italic">
+                No hay inscripciones registradas.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+}
 export default InscripcionesSacramentales;
+
+
+
+
+
+

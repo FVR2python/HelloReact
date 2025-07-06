@@ -120,26 +120,22 @@ function EventosLiturgicos() {
     setEditando(null);
   };
 
+  const formatearFechaHora = (valor) => {
+    return valor ? new Date(valor).toLocaleString('es-PE', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) : '-';
+  };
+
   return (
     <div className="p-6 rounded-xl shadow-md bg-white">
       <h2 className="text-xl font-semibold text-blue-600 mb-4">Gestión de Eventos Litúrgicos</h2>
 
       <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg shadow border mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Nombre del Evento</label>
-            <input
-              type="text"
-              name="tipo_evento"
-              value={formData.tipo_evento}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:outline-none"
-              required
-            />
-          </div>
+          <input type="hidden" name="tipo_evento" value="liturgico" />
 
           <div>
-            <label className="block text-sm font-medium mb-1">Nombre</label>
+            <label className="block text-sm font-medium mb-1">Nombre del Evento</label>
             <input
               type="text"
               name="nombre"
@@ -240,7 +236,6 @@ function EventosLiturgicos() {
         <table className="min-w-full text-sm text-center">
           <thead className="bg-blue-600 text-white uppercase">
             <tr>
-              <th className="px-4 py-2">Nombre del Evento</th>
               <th className="px-4 py-2">Nombre</th>
               <th className="px-4 py-2">Fecha</th>
               <th className="px-4 py-2">Inicio</th>
@@ -253,11 +248,10 @@ function EventosLiturgicos() {
             {eventos.length > 0 ? (
               eventos.map(e => (
                 <tr key={e.id_evento} className="border-t">
-                  <td className="px-3 py-2">{e.tipo_evento}</td>
                   <td className="px-3 py-2">{e.nombre}</td>
-                  <td className="px-3 py-2">{e.fecha}</td>
-                  <td className="px-3 py-2">{e.hora_inicio}</td>
-                  <td className="px-3 py-2">{e.hora_fin || '-'}</td>
+                  <td className="px-3 py-2">{formatearFechaHora(e.fecha)}</td>
+                  <td className="px-3 py-2">{formatearFechaHora(e.hora_inicio)}</td>
+                  <td className="px-3 py-2">{formatearFechaHora(e.hora_fin)}</td>
                   <td className="px-3 py-2">{e.nombre_parroquia}</td>
                   <td className="px-3 py-2">
                     <div className="flex justify-center gap-2">
@@ -279,7 +273,7 @@ function EventosLiturgicos() {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="px-4 py-3 text-gray-500">
+                <td colSpan="6" className="px-4 py-3 text-gray-500">
                   No hay eventos registrados
                 </td>
               </tr>

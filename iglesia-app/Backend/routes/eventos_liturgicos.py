@@ -3,7 +3,7 @@ from db.conexion import get_connection
 
 eventos_liturgicos_bp = Blueprint('eventos_liturgicos_bp', __name__)
 
-# Listar eventos litúrgicos
+# 📌 Listar eventos litúrgicos
 @eventos_liturgicos_bp.route('/eventos_liturgicos', methods=['GET'])
 def listar_eventos():
     try:
@@ -11,7 +11,7 @@ def listar_eventos():
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT 
-                e.id_evento, e.tipo_evento, e.nombre, e.fecha,
+                e.id_evento, e.nombre, e.fecha,
                 e.hora_inicio, e.hora_fin, e.observacion, e.id_parroquia,
                 p.nombre_prrq AS nombre_parroquia
             FROM eventos_liturgicos e
@@ -24,7 +24,7 @@ def listar_eventos():
     except Exception as e:
         return jsonify({"mensaje": f"Error al listar eventos: {str(e)}"}), 500
 
-# Crear evento litúrgico
+# 📌 Crear evento litúrgico
 @eventos_liturgicos_bp.route('/eventos_liturgicos', methods=['POST'])
 def crear_evento():
     data = request.get_json()
@@ -34,11 +34,10 @@ def crear_evento():
         cursor.execute("""
             INSERT INTO eventos_liturgicos
             (tipo_evento, nombre, fecha, hora_inicio, hora_fin, observacion, id_parroquia)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            VALUES ('liturgico', %s, %s, %s, %s, %s, %s)
         """, (
-            data['tipo_evento'], data['nombre'], data['fecha'],
-            data['hora_inicio'], data.get('hora_fin'),
-            data.get('observacion'), data['id_parroquia']
+            data['nombre'], data['fecha'], data['hora_inicio'],
+            data.get('hora_fin'), data.get('observacion'), data['id_parroquia']
         ))
         conn.commit()
         cursor.close()
@@ -47,7 +46,7 @@ def crear_evento():
     except Exception as e:
         return jsonify({"mensaje": f"Error al registrar evento: {str(e)}"}), 500
 
-# Actualizar evento litúrgico
+# 📌 Actualizar evento litúrgico
 @eventos_liturgicos_bp.route('/eventos_liturgicos/<int:id_evento>', methods=['PUT'])
 def actualizar_evento(id_evento):
     data = request.get_json()
@@ -56,13 +55,13 @@ def actualizar_evento(id_evento):
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE eventos_liturgicos
-            SET tipo_evento=%s, nombre=%s, fecha=%s,
+            SET tipo_evento='liturgico', nombre=%s, fecha=%s,
                 hora_inicio=%s, hora_fin=%s, observacion=%s, id_parroquia=%s
             WHERE id_evento=%s
         """, (
-            data['tipo_evento'], data['nombre'], data['fecha'],
-            data['hora_inicio'], data.get('hora_fin'),
-            data.get('observacion'), data['id_parroquia'], id_evento
+            data['nombre'], data['fecha'], data['hora_inicio'],
+            data.get('hora_fin'), data.get('observacion'),
+            data['id_parroquia'], id_evento
         ))
         conn.commit()
         cursor.close()
@@ -71,7 +70,7 @@ def actualizar_evento(id_evento):
     except Exception as e:
         return jsonify({"mensaje": f"Error al actualizar evento: {str(e)}"}), 500
 
-# Eliminar evento litúrgico
+# 📌 Eliminar evento litúrgico
 @eventos_liturgicos_bp.route('/eventos_liturgicos/<int:id_evento>', methods=['DELETE'])
 def eliminar_evento(id_evento):
     try:

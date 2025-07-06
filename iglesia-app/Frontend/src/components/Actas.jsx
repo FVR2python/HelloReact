@@ -172,7 +172,7 @@ function Actas() {
             <option value="">Seleccione evento</option>
             {eventos.map(e => (
               <option key={e.id_evento} value={e.id_evento}>
-                {e.nombre_event} - {e.fecha_event}
+                {e.nombre_event} - {new Date(e.fecha_event).toLocaleDateString('es-PE')}
               </option>
             ))}
           </select>
@@ -215,9 +215,9 @@ function Actas() {
             {actas.length > 0 ? (
               actas.map(a => (
                 <tr key={a.id_acta}>
-                  <td className="px-4 py-2">{a.fecha_emision}</td>
+                  <td className="px-4 py-2">{new Date(a.fecha_emision).toLocaleDateString('es-PE')}</td>
                   <td className="px-4 py-2">{a.tipo_documento}</td>
-                  <td className="px-4 py-2">{a.nombre_event} - {a.fecha_event}</td>
+                  <td className="px-4 py-2">{a.nombre_event} - {new Date(a.fecha_event).toLocaleDateString('es-PE')}</td>
                   <td className="px-4 py-2 text-center">
                     <button
                       onClick={() => handleDescargar(a.id_acta)}

@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from db.conexion import get_connection
+from datetime import date
 
 grupos_bp = Blueprint('grupos_bp', __name__)
 
@@ -18,11 +19,20 @@ def listar_grupos():
             JOIN parroquias p ON g.id_parroquia = p.id_parroquia
         """)
         grupos = cursor.fetchall()
+
+        # ✅ Formatear fechas a string YYYY-MM-DD
+        for g in grupos:
+            if isinstance(g["fecha_inicio"], (date,)):
+                g["fecha_inicio"] = g["fecha_inicio"].isoformat()
+            if isinstance(g["fecha_fin"], (date,)):
+                g["fecha_fin"] = g["fecha_fin"].isoformat()
+
         cursor.close()
         conn.close()
         return jsonify(grupos)
     except Exception as e:
         return jsonify({"mensaje": f"Error al listar grupos: {str(e)}"}), 500
+
 
 # 📌 POST - Crear grupo de catequesis
 @grupos_bp.route('/grupos-catequesis', methods=['POST'])
@@ -47,6 +57,7 @@ def crear_grupo():
         return jsonify({"mensaje": "Grupo registrado correctamente"}), 201
     except Exception as e:
         return jsonify({"mensaje": f"Error al registrar grupo: {str(e)}"}), 500
+
 
 # 📌 PUT - Actualizar grupo de catequesis
 @grupos_bp.route('/grupos-catequesis/<int:id_grupo>', methods=['PUT'])
@@ -73,6 +84,7 @@ def actualizar_grupo(id_grupo):
         return jsonify({"mensaje": "Grupo actualizado correctamente"})
     except Exception as e:
         return jsonify({"mensaje": f"Error al actualizar grupo: {str(e)}"}), 500
+
 
 # 📌 DELETE - Eliminar grupo de catequesis
 @grupos_bp.route('/grupos-catequesis/<int:id_grupo>', methods=['DELETE'])

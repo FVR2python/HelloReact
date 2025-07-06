@@ -29,7 +29,7 @@ from routes.egresos_mantenimiento import egresos_bp
 from routes.auditoria_transacciones import auditoria_bp
 from routes.parroquias import parroquias_bp
 from routes.tipos_transacciones import tipos_bp
-from routes.participantes_sacramentales import participantes_sacramentales
+from routes.participantes_sacramentales import participantes_sacramentales_bp
 from routes.participantes_liturgicos import participantes_liturgicos
 from routes.eventos_liturgicos import eventos_liturgicos_bp
 from routes.crud_eventos_sacramentales import crud_eventos_sacramentales_bp
@@ -64,7 +64,7 @@ app.register_blueprint(egresos_bp)
 app.register_blueprint(auditoria_bp)
 app.register_blueprint(parroquias_bp)
 app.register_blueprint(tipos_bp)
-app.register_blueprint(participantes_sacramentales)
+app.register_blueprint(participantes_sacramentales_bp)
 app.register_blueprint(participantes_liturgicos)
 app.register_blueprint(eventos_liturgicos_bp)
 app.register_blueprint(crud_eventos_sacramentales_bp)

@@ -103,23 +103,23 @@ function EvaluacionesCatequesis() {
   };
 
 return (
-  <div className="p-6 bg-white rounded-2xl shadow-md">
-    <h2 className="text-xl font-semibold text-blue-600 mb-4">
-      Gestión de Evaluaciones de Catequesis
+  <div className="p-6 bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-lg">
+    <h2 className="text-2xl font-bold text-blue-700 mb-6 border-b pb-2">
+      📘 Gestión de Evaluaciones de Catequesis
     </h2>
 
     <form
       onSubmit={handleSubmit}
-      className="bg-white border rounded-2xl shadow p-4 mb-6"
+      className="bg-white border border-blue-200 rounded-2xl shadow p-6 mb-8"
     >
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-5">
         <div className="col-span-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Grupo</label>
+          <label className="text-sm font-semibold text-gray-600 mb-1 block">Grupo</label>
           <select
             name="id_grupo"
             value={formData.id_grupo}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Seleccione</option>
             {grupos.map(g => (
@@ -129,12 +129,12 @@ return (
         </div>
 
         <div className="col-span-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Catequizando</label>
+          <label className="text-sm font-semibold text-gray-600 mb-1 block">Catequizando</label>
           <select
             name="id_persona"
             value={formData.id_persona}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Seleccione</option>
             {catequizandos.map(p => (
@@ -146,7 +146,7 @@ return (
         </div>
 
         <div className="col-span-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nota</label>
+          <label className="text-sm font-semibold text-gray-600 mb-1 block">Nota</label>
           <input
             type="number"
             name="nota"
@@ -154,17 +154,17 @@ return (
             max="20"
             value={formData.nota}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div className="col-span-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+          <label className="text-sm font-semibold text-gray-600 mb-1 block">Estado</label>
           <select
             name="estado_final"
             value={formData.estado_final}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Seleccione</option>
             <option value="aprobado">Aprobado</option>
@@ -174,32 +174,32 @@ return (
         </div>
 
         <div className="col-span-5">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+          <label className="text-sm font-semibold text-gray-600 mb-1 block">Observaciones</label>
           <input
             type="text"
             name="observaciones"
             value={formData.observaciones}
             onChange={handleChange}
             placeholder="Observaciones..."
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div className="col-span-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+          <label className="text-sm font-semibold text-gray-600 mb-1 block">Fecha</label>
           <input
             type="date"
             name="fecha_evaluacion"
             value={formData.fecha_evaluacion}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-300 px-3 py-[0.42rem] text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div className="col-span-12 flex justify-end items-end">
+        <div className="col-span-12 flex justify-end items-end mt-1">
           <button
             type="submit"
-            className="bg-blue-600 text-white rounded-xl px-5 py-2 text-sm hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition-all"
           >
             {editando ? 'Actualizar' : 'Registrar'}
           </button>
@@ -207,39 +207,39 @@ return (
       </div>
     </form>
 
-    <div className="overflow-x-auto rounded-2xl shadow">
-      <table className="min-w-full text-sm text-center table-auto">
-        <thead className="bg-blue-600 text-white uppercase">
+    <div className="overflow-x-auto rounded-2xl shadow-md border">
+      <table className="min-w-full text-sm text-center bg-white">
+        <thead className="bg-blue-600 text-white">
           <tr>
-            <th className="px-4 py-2">Grupo</th>
-            <th className="px-4 py-2">Catequizando</th>
-            <th className="px-4 py-2">Nota</th>
-            <th className="px-4 py-2">Estado</th>
-            <th className="px-4 py-2">Obs.</th>
-            <th className="px-4 py-2">Fecha</th>
-            <th className="px-4 py-2">Acciones</th>
+            <th className="px-4 py-3">Grupo</th>
+            <th className="px-4 py-3">Catequizando</th>
+            <th className="px-4 py-3">Nota</th>
+            <th className="px-4 py-3">Estado</th>
+            <th className="px-4 py-3">Obs.</th>
+            <th className="px-4 py-3">Fecha</th>
+            <th className="px-4 py-3">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {evaluaciones.length > 0 ? (
             evaluaciones.map((e) => (
-              <tr key={e.id_evaluacion} className="border-b hover:bg-gray-50">
+              <tr key={e.id_evaluacion} className="border-b hover:bg-gray-100 transition">
                 <td className="px-4 py-2">{e.nombre_grupo}</td>
                 <td className="px-4 py-2">{e.catequizando}</td>
                 <td className="px-4 py-2">{e.nota}</td>
-                <td className="px-4 py-2">{e.estado_final}</td>
+                <td className="px-4 py-2 capitalize">{e.estado_final}</td>
                 <td className="px-4 py-2">{e.observaciones}</td>
                 <td className="px-4 py-2">{new Date(e.fecha_evaluacion).toLocaleDateString()}</td>
-                <td className="px-4 py-2 space-x-1">
+                <td className="px-4 py-2 space-x-2">
                   <button
                     onClick={() => handleEditar(e)}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 hover:underline font-medium"
                   >
                     Editar
                   </button>
                   <button
                     onClick={() => handleEliminar(e.id_evaluacion)}
-                    className="text-red-600 hover:text-red-800"
+                    className="text-red-600 hover:underline font-medium"
                   >
                     Eliminar
                   </button>
@@ -258,7 +258,6 @@ return (
     </div>
   </div>
 );
-
 }
 
 export default EvaluacionesCatequesis;

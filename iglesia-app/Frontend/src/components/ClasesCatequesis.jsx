@@ -204,7 +204,7 @@ return (
             clases.map((c, i) => (
               <tr key={c.id_clase}>
                 <td className="px-4 py-2 text-center">{i + 1}</td>
-                <td className="px-4 py-2">{c.fecha?.split('T')[0]}</td>
+                <td className="px-4 py-2">{new Date(c.fecha).toLocaleDateString()}</td>
                 <td className="px-4 py-2">{c.hora_inicio}</td>
                 <td className="px-4 py-2">{c.hora_fin}</td>
                 <td className="px-4 py-2">{c.tema}</td>

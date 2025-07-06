@@ -20,6 +20,12 @@ function GruposCatequesis() {
     obtenerParroquias();
   }, []);
 
+  const formatearFecha = (fechaISO) => {
+    if (!fechaISO) return '';
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleDateString('es-PE');
+  };
+
   const obtenerGrupos = async () => {
     try {
       const res = await fetch('http://localhost:5000/grupos-catequesis');
@@ -221,10 +227,10 @@ function GruposCatequesis() {
             {grupos.map(g => (
               <tr key={g.id_grupo}>
                 <td className="px-4 py-2">{g.nombre_grupo}</td>
-                <td className="px-4 py-2">{g.fecha_inicio?.split('T')[0]}</td>
-                <td className="px-4 py-2">{g.fecha_fin?.split('T')[0]}</td>
-                <td className="px-4 py-2">{g.nombre_sacrament}</td>
-                <td className="px-4 py-2">{g.nombre_prrq}</td>
+                <td className="px-4 py-2">{formatearFecha(g.fecha_inicio)}</td>
+                <td className="px-4 py-2">{formatearFecha(g.fecha_fin)}</td>
+                <td className="px-4 py-2">{g.nombre_sacramento}</td>
+                <td className="px-4 py-2">{g.nombre_parroquia}</td>
                 <td className="px-4 py-2 text-center">
                   <div className="flex justify-center gap-2">
                     <button

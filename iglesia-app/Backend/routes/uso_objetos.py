@@ -3,6 +3,7 @@ from db.conexion import get_connection
 
 uso_objetos_bp = Blueprint('uso_objetos_bp', __name__)
 
+# 📌 GET - Listar usos
 @uso_objetos_bp.route('/uso_objetos', methods=['GET'])
 def listar_usos():
     try:
@@ -11,8 +12,11 @@ def listar_usos():
         cursor.execute("""
             SELECT 
                 u.id_uso,
-                u.estado_post_uso,
+                u.id_inventario,
                 u.tipo_evento,
+                u.id_evento_sacramental,
+                u.id_evento_liturgico,
+                u.estado_post_uso,
                 u.observacion,
                 i.nombre_invent,
                 COALESCE(es.nombre_event, el.nombre) AS nombre_evento,
@@ -29,6 +33,7 @@ def listar_usos():
     except Exception as e:
         return jsonify({"mensaje": f"Error al listar usos: {str(e)}"}), 500
 
+# 📌 POST - Crear nuevo uso
 @uso_objetos_bp.route('/uso_objetos', methods=['POST'])
 def crear_uso():
     data = request.get_json()
@@ -58,6 +63,7 @@ def crear_uso():
             return jsonify({"mensaje": "Ya existe un registro de uso para este inventario y evento."}), 409
         return jsonify({"mensaje": f"Error al registrar uso: {msg}"}), 500
 
+# 📌 PUT - Actualizar uso
 @uso_objetos_bp.route('/uso_objetos/<int:id_uso>', methods=['PUT'])
 def actualizar_uso(id_uso):
     data = request.get_json()
@@ -92,6 +98,7 @@ def actualizar_uso(id_uso):
             return jsonify({"mensaje": "Ya existe un uso con esos datos."}), 409
         return jsonify({"mensaje": f"Error al actualizar uso: {msg}"}), 500
 
+# 📌 DELETE - Eliminar uso
 @uso_objetos_bp.route('/uso_objetos/<int:id_uso>', methods=['DELETE'])
 def eliminar_uso(id_uso):
     try:

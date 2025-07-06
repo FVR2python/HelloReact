@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
 function Transacciones() {
+  const BASE_URL = 'http://localhost:5000';
+
   const [transacciones, setTransacciones] = useState([]);
   const [parroquias, setParroquias] = useState([]);
   const [tipos, setTipos] = useState([]);
@@ -31,32 +33,32 @@ function Transacciones() {
   }, []);
 
   const obtenerTransacciones = async () => {
-    const res = await fetch('/transacciones');
+    const res = await fetch(`${BASE_URL}/transacciones`);
     setTransacciones(await res.json());
   };
 
   const obtenerParroquias = async () => {
-    const res = await fetch('/parroquias');
+    const res = await fetch(`${BASE_URL}/parroquias`);
     setParroquias(await res.json());
   };
 
   const obtenerTipos = async () => {
-    const res = await fetch('/tipos_transacciones');
+    const res = await fetch(`${BASE_URL}/tipos_transacciones`);
     setTipos(await res.json());
   };
 
   const obtenerEventosSacra = async () => {
-    const res = await fetch('/eventos_sacramentales');
+    const res = await fetch(`${BASE_URL}/eventos_sacramentales`);
     setEventosSacra(await res.json());
   };
 
   const obtenerEventosLiturg = async () => {
-    const res = await fetch('/eventos_liturgicos');
+    const res = await fetch(`${BASE_URL}/eventos_liturgicos`);
     setEventosLiturg(await res.json());
   };
 
   const obtenerPersonas = async () => {
-    const res = await fetch('/personas');
+    const res = await fetch(`${BASE_URL}/personas`);
     setPersonas(await res.json());
   };
 
@@ -66,7 +68,7 @@ function Transacciones() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const url = editando ? `/transacciones/${editando}` : '/transacciones';
+    const url = editando ? `${BASE_URL}/transacciones/${editando}` : `${BASE_URL}/transacciones`;
     const method = editando ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
@@ -109,7 +111,7 @@ function Transacciones() {
       cancelButtonText: 'Cancelar'
     });
     if (result.isConfirmed) {
-      const res = await fetch(`/transacciones/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${BASE_URL}/transacciones/${id}`, { method: 'DELETE' });
       if (res.ok) {
         obtenerTransacciones();
         Swal.fire('Eliminado', 'Transacción eliminada correctamente', 'success');
@@ -197,8 +199,8 @@ function Transacciones() {
             {(formData.tipo_evento === 'sacramental' ? eventosSacra : eventosLiturg).map(e => (
               <option key={e.id_evento} value={e.id_evento}>
                 {formData.tipo_evento === 'sacramental'
-                  ? `${e.nombre_event} - ${e.fecha_event}`
-                  : `${e.nombre} - ${e.fecha}`}
+                  ? `${e.nombre_event} - ${new Date(e.fecha_event).toLocaleDateString('es-PE')}`
+                  : `${e.nombre} - ${new Date(e.fecha).toLocaleDateString('es-PE')}`}
               </option>
             ))}
           </select>
@@ -230,7 +232,7 @@ function Transacciones() {
           <tbody className="divide-y divide-gray-200">
             {transacciones.length > 0 ? transacciones.map(t => (
               <tr key={t.id_transaccion}>
-                <td className="table-td">{t.fecha_transaccion}</td>
+                <td className="table-td">{new Date(t.fecha_transaccion).toLocaleDateString('es-PE')}</td>
                 <td className="table-td">S/ {parseFloat(t.monto).toFixed(2)}</td>
                 <td className="table-td">{t.num_comprobante}</td>
                 <td className="table-td">{t.descripcion}</td>

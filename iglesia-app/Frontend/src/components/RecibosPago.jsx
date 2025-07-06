@@ -26,7 +26,7 @@ function RecibosPago() {
   };
 
   const obtenerInscripciones = async () => {
-    const res = await fetch('http://localhost:5000/inscripciones_sacramentales');
+    const res = await fetch('http://localhost:5000/inscripciones');
     setInscripciones(await res.json());
   };
 
@@ -41,6 +41,15 @@ function RecibosPago() {
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
+  };
+
+  const formatearFecha = fechaISO => {
+    if (!fechaISO) return '';
+    return new Date(fechaISO).toLocaleDateString('es-PE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
   };
 
   const handleSubmit = async e => {
@@ -151,7 +160,7 @@ function RecibosPago() {
             <option value="">Seleccione</option>
             {inscripciones.map(i => (
               <option key={i.id_inscripcion} value={i.id_inscripcion}>
-                {i.nombres} {i.apellido1} - {i.nombre_sacrament}
+                {i.nombres} {i.apellido1} - {i.nombre_sacramento}
               </option>
             ))}
           </select>
@@ -194,9 +203,9 @@ function RecibosPago() {
           <tbody className="divide-y divide-gray-200">
             {recibos.length > 0 ? recibos.map(r => (
               <tr key={r.id_recibo}>
-                <td className="table-td">{r.fecha_pago}</td>
+                <td className="table-td">{formatearFecha(r.fecha_pago)}</td>
                 <td className="table-td">S/ {parseFloat(r.monto).toFixed(2)}</td>
-                <td className="table-td">{r.nombres} {r.apellido1} - {r.nombre_sacrament}</td>
+                <td className="table-td">{r.nombres} {r.apellido1} - {r.nombre_sacramento}</td>
                 <td className="table-td">{r.descripcion_transaccion}</td>
                 <td className="table-td">
                   <button onClick={() => handleDescargar(r.id_recibo)} className="btn-icon-edit">📄 Descargar</button>

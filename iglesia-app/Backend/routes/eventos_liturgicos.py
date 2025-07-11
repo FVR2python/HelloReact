@@ -18,6 +18,16 @@ def listar_eventos():
             JOIN parroquias p ON e.id_parroquia = p.id_parroquia
         """)
         data = cursor.fetchall()
+        for evento in data:
+            for campo in ['hora_inicio', 'hora_fin']:
+                valor = evento[campo]
+                if hasattr(valor, 'seconds'):
+                    horas = valor.seconds // 3600
+                    minutos = (valor.seconds % 3600) // 60
+                    segundos = valor.seconds % 60
+                    evento[campo] = f"{horas:02}:{minutos:02}:{segundos:02}"
+                elif not isinstance(valor, str):
+                    evento[campo] = str(valor)
         cursor.close()
         conn.close()
         return jsonify(data)

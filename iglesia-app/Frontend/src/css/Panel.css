@@ -1,6 +1,6 @@
 /* Fondo general del área principal */
 .app-content {
-  background-color: #eef6fb; /* Celeste muy suave */
+  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
   min-height: 100vh;
   padding: 2rem;
 }
@@ -11,14 +11,14 @@ body.bg-dark .app-content {
 
 /* Panel principal */
 .content-panel {
-  background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #fff 60%, #e0e7ff 100%);
+  border: none;
+  border-radius: 1.5rem;
   padding: 2rem;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 32px rgba(80, 56, 200, 0.12);
   max-width: 1300px;
   margin: 0 auto;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  transition: background 0.3s, color 0.3s;
 }
 
 body.bg-dark .content-panel {
@@ -31,10 +31,13 @@ body.bg-dark .content-panel {
 .content-panel > h2,
 .content-panel > h4 {
   margin-bottom: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #007bff;
+  font-weight: 700;
+  border-bottom: 2px solid #7c3aed;
   padding-bottom: 0.5rem;
-  color: #007bff;
+  color: #7c3aed;
+  background: linear-gradient(90deg, #7c3aed 60%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 body.bg-dark .content-panel > h2,
@@ -45,11 +48,12 @@ body.bg-dark .content-panel > h4 {
 
 /* Formulario */
 .content-panel form {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f3e8ff 60%, #e0e7ff 100%);
   padding: 1.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #dee2e6;
+  border-radius: 1rem;
+  border: none;
   margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
 }
 
 body.bg-dark .content-panel form {
@@ -61,116 +65,53 @@ body.bg-dark .content-panel form {
 .content-panel input,
 .content-panel select,
 .content-panel textarea {
-  border-radius: 0.375rem;
-  padding: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #a5b4fc;
+  background: #f3e8ff;
+  transition: border-color 0.2s;
 }
 
-body.bg-dark .content-panel input,
-body.bg-dark .content-panel select,
-body.bg-dark .content-panel textarea {
-  background-color: #333;
-  color: #ddd;
-  border-color: #555;
+.content-panel input:focus,
+.content-panel select:focus,
+.content-panel textarea:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.15);
 }
 
 /* Tabla */
 .content-panel .table {
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   overflow: hidden;
-  background-color: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  background: linear-gradient(135deg, #fff 60%, #e0e7ff 100%);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
 }
 
 .content-panel .table th {
-  background-color: #007bff;
+  background: linear-gradient(90deg, #7c3aed 60%, #6366f1 100%);
   color: #fff;
-}
-
-body.bg-dark .content-panel .table {
-  background-color: #2a2a2a;
-}
-
-body.bg-dark .content-panel .table th {
-  background-color: #339cff;
-  color: #fff;
-}
-
-/* Botones */
-.content-panel button {
-  min-width: 100px;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.content-panel button:hover {
-  filter: brightness(0.95);
-}
-
-/* Mejor espaciado en los formularios */
-.content-panel form .form-control,
-.content-panel form .form-select {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.95rem;
-}
-
-.content-panel form .form-label {
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-}
-
-/* Mejora de inputs y selects */
-.content-panel input:focus,
-.content-panel select:focus,
-.content-panel textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-body.bg-dark .content-panel input:focus,
-body.bg-dark .content-panel select:focus,
-body.bg-dark .content-panel textarea:focus {
-  border-color: #339cff;
-  box-shadow: 0 0 0 0.2rem rgba(51, 156, 255, 0.25);
-}
-
-/* Botones más definidos */
-.content-panel .btn {
-  border-radius: 0.375rem;
-  padding: 0.4rem 1rem;
-}
-
-.content-panel .btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-
-.content-panel .btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-.content-panel .btn-outline-primary:hover {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.content-panel .btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-/* Tablas */
-.content-panel .table td,
-.content-panel .table th {
-  vertical-align: middle;
-  padding: 0.6rem;
+  font-weight: 600;
 }
 
 .content-panel .table-hover tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.05);
+  background-color: #ede9fe;
 }
 
-body.bg-dark .content-panel .table-hover tbody tr:hover {
-  background-color: rgba(51, 156, 255, 0.1);
+/* Botones */
+.content-panel .btn {
+  border-radius: 0.75rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #6366f1 60%, #7c3aed 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  border: none;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.content-panel .btn:hover {
+  background: linear-gradient(90deg, #7c3aed 60%, #6366f1 100%);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.16);
 }
 
 /* Responsive tweaks */

@@ -133,6 +133,16 @@ function PersonasRoles() {
     setEditando(null);
   };
 
+  const formatearFecha = (valor) => {
+    return valor
+      ? new Date(valor).toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        })
+      : '—';
+  };
+
 return (
   <div className="p-6 max-w-7xl mx-auto">
     <h2 className="text-2xl font-bold text-blue-700 mb-6">Asignación de Roles a Personas</h2>
@@ -248,8 +258,8 @@ return (
                 <td className="px-4 py-2">{a.nombres} {a.apellido1}</td>
                 <td className="px-4 py-2">{a.nombre_rol}</td>
                 <td className="px-4 py-2">{a.tipo_contexto}</td>
-                <td className="px-4 py-2">{new Date(a.fecha_inicio).toLocaleDateString('es-PE')}</td>
-                <td className="px-4 py-2">{a.fecha_fin ? new Date(a.fecha_fin).toLocaleDateString('es-PE') : '—'}</td>
+                <td className="px-4 py-2">{formatearFecha(a.fecha_inicio)}</td>
+                <td className="px-4 py-2">{formatearFecha(a.fecha_fin)}</td>
                 <td className="px-4 py-2">
                   <div className="flex justify-center gap-2">
                     <button onClick={() => handleEditar(a)} className="btn-icon-edit text-sm">Editar</button>

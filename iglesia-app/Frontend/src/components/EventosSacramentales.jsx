@@ -27,7 +27,13 @@ function EventosSacramentales() {
 
   const obtenerEventos = async () => {
     const res = await fetch('http://localhost:5000/eventos_sacramentales');
-    setEventos(await res.json());
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      setEventos(data);
+    } else {
+      setEventos([]);
+      Swal.fire('Error', data.mensaje || 'No se pudo cargar los eventos.', 'error');
+    }
   };
 
   const obtenerParroquias = async () => {
@@ -129,6 +135,16 @@ function EventosSacramentales() {
     setEditando(null);
   };
 
+  const formatearFecha = (valor) => {
+    return valor
+      ? new Date(valor).toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        })
+      : '-';
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-blue-600">Gestión de Eventos Sacramentales</h2>
@@ -157,14 +173,26 @@ function EventosSacramentales() {
 
         <div>
           <label className="block text-sm font-medium mb-1">Hora Inicio</label>
-          <input type="datetime-local" name="hora_inicio" className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={formData.hora_inicio} onChange={handleChange} required />
+          <input
+            type="time"
+            name="hora_inicio"
+            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={formData.hora_inicio}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">Hora Fin</label>
-          <input type="datetime-local" name="hora_fin" className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={formData.hora_fin} onChange={handleChange} required />
+          <input
+            type="time"
+            name="hora_fin"
+            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={formData.hora_fin}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div>
@@ -231,9 +259,9 @@ function EventosSacramentales() {
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
             {eventos.map(e => {
-              const fecha = new Date(e.fecha_event).toLocaleDateString('es-PE');
-              const horaInicio = new Date(e.hora_inicio).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
-              const horaFin = new Date(e.hora_fin).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+              const fecha = formatearFecha(e.fecha_event);
+              const horaInicio = e.hora_inicio ? e.hora_inicio.slice(0, 5) : '';
+              const horaFin = e.hora_fin ? e.hora_fin.slice(0, 5) : '';
 
               return (
                 <tr key={e.id_evento}>

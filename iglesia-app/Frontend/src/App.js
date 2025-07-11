@@ -45,6 +45,8 @@ import Parroquias from './components/Parroquias';
 import TiposTransacciones from './components/TiposTransacciones';
 import SacramentosPrecios from './components/SacramentosPrecios';
 
+import './css/style.css';
+
 function App() {
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(true);
@@ -62,64 +64,66 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          usuario ? <Navigate to="/menu" /> : <Login setUsuario={setUsuario} />
-        }
-      />
+    <div className="min-h-screen bg-gray-100">
+      <Routes>
+        <Route
+          path="/"
+          element={
+            usuario ? <Navigate to="/menu" /> : <Login setUsuario={setUsuario} />
+          }
+        />
 
-      {usuario ? (
-        <Route element={<Layout usuario={usuario} setUsuario={setUsuario} />}>
-          <Route path="/menu" element={<Inicio usuario={usuario} />} />
+        {usuario ? (
+          <Route element={<Layout usuario={usuario} setUsuario={setUsuario} />}>
+            <Route path="/menu" element={<Inicio usuario={usuario} />} />
 
-          {/* Sacramentos */}
-          <Route path="/sacramentos/*" element={<ModuloSacramentos />} />
-          <Route path="/sacramentos/inscripciones" element={<InscripcionesSacramentales />} />
-          <Route path="/sacramentos/eventos" element={<EventosSacramentales />} />
-          <Route path="/sacramentos/actas" element={<Actas />} />
-          <Route path="/sacramentos/participantes" element={<ParticipantesEventosSacramentales />} />
+            {/* Sacramentos */}
+            <Route path="/sacramentos/*" element={<ModuloSacramentos />} />
+            <Route path="/sacramentos/inscripciones" element={<InscripcionesSacramentales />} />
+            <Route path="/sacramentos/eventos" element={<EventosSacramentales />} />
+            <Route path="/sacramentos/actas" element={<Actas />} />
+            <Route path="/sacramentos/participantes" element={<ParticipantesEventosSacramentales />} />
 
-          {/* Catequesis */}
-          <Route path="/catequesis/grupos" element={<GruposCatequesis />} />
-          <Route path="/catequesis/clases" element={<ClasesCatequesis />} />
-          <Route path="/catequesis/asistencia" element={<AsistenciaCatequesis />} />
-          <Route path="/catequesis/evaluacion" element={<EvaluacionesCatequesis />} />
+            {/* Catequesis */}
+            <Route path="/catequesis/grupos" element={<GruposCatequesis />} />
+            <Route path="/catequesis/clases" element={<ClasesCatequesis />} />
+            <Route path="/catequesis/asistencia" element={<AsistenciaCatequesis />} />
+            <Route path="/catequesis/evaluacion" element={<EvaluacionesCatequesis />} />
 
-          {/* Liturgia e inventario */}
-          <Route path="/liturgia/eventos" element={<EventosLiturgicos />} />
-          <Route path="/liturgia/participantes" element={<ParticipantesEventosLiturgicos />} />
-          <Route path="/inventario/objetos" element={<ObjetosLiturgicos />} />
-          <Route path="/inventario/uso" element={<UsoObjetos />} />
+            {/* Liturgia e inventario */}
+            <Route path="/liturgia/eventos" element={<EventosLiturgicos />} />
+            <Route path="/liturgia/participantes" element={<ParticipantesEventosLiturgicos />} />
+            <Route path="/inventario/objetos" element={<ObjetosLiturgicos />} />
+            <Route path="/inventario/uso" element={<UsoObjetos />} />
 
-          {/* Tesorería */}
-          <Route path="/finanzas/transacciones" element={<Transacciones />} />
-          <Route path="/finanzas/pagos-inscripcion" element={<RecibosPago />} />
-          <Route path="/finanzas/egresos" element={<EgresosMantenimiento />} />
-          <Route path="/finanzas/auditoria" element={<AuditoriaTransacciones />} />
+            {/* Tesorería */}
+            <Route path="/finanzas/transacciones" element={<Transacciones />} />
+            <Route path="/finanzas/pagos-inscripcion" element={<RecibosPago />} />
+            <Route path="/finanzas/egresos" element={<EgresosMantenimiento />} />
+            <Route path="/finanzas/auditoria" element={<AuditoriaTransacciones />} />
 
-          {/* Administración */}
-          <Route path="/admin/personas" element={<Personas />} />
-          <Route path="/admin/usuarios" element={<Usuarios />} />
-          <Route path="/admin/cargos" element={<Cargos />} />
-          <Route path="/admin/roles" element={<Roles />} />
-          <Route path="/admin/asignacion" element={<PersonasRoles />} />
-          <Route path="/admin/clerigos" element={<Clerigos />} />
-          <Route path="/admin/jerarquias" element={<Jerarquias />} />
+            {/* Administración */}
+            <Route path="/admin/personas" element={<Personas />} />
+            <Route path="/admin/usuarios" element={<Usuarios />} />
+            <Route path="/admin/cargos" element={<Cargos />} />
+            <Route path="/admin/roles" element={<Roles />} />
+            <Route path="/admin/asignacion" element={<PersonasRoles />} />
+            <Route path="/admin/clerigos" element={<Clerigos />} />
+            <Route path="/admin/jerarquias" element={<Jerarquias />} />
 
-          {/* Configuración */}
-          <Route path="/config/sacramentos" element={<SacramentosPrecios />} />
-          <Route path="/config/parroquias" element={<Parroquias />} />
-          <Route path="/config/tipos-transaccion" element={<TiposTransacciones />} />
+            {/* Configuración */}
+            <Route path="/config/sacramentos" element={<SacramentosPrecios />} />
+            <Route path="/config/parroquias" element={<Parroquias />} />
+            <Route path="/config/tipos-transaccion" element={<TiposTransacciones />} />
 
-          {/* Perfil */}
-          <Route path="/perfil" element={<PerfilUsuario usuario={usuario} />} />
-        </Route>
-      ) : (
-        <Route path="*" element={<Navigate to="/" />} />
-      )}
-    </Routes>
+            {/* Perfil */}
+            <Route path="/perfil" element={<PerfilUsuario usuario={usuario} />} />
+          </Route>
+        ) : (
+          <Route path="*" element={<Navigate to="/" />} />
+        )}
+      </Routes>
+    </div>
   );
 }
 

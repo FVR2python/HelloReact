@@ -106,6 +106,18 @@ function ClasesCatequesis() {
     }
   };
 
+  const formatearFecha = (valor) => {
+    return valor
+      ? new Date(valor).toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        })
+      : '-';
+  };
+
+console.log(clases);
+
 return (
   <div className="space-y-6">
     <h2 className="text-2xl font-bold text-blue-600">Gestión de Clases de Catequesis</h2>
@@ -204,7 +216,7 @@ return (
             clases.map((c, i) => (
               <tr key={c.id_clase}>
                 <td className="px-4 py-2 text-center">{i + 1}</td>
-                <td className="px-4 py-2">{new Date(c.fecha).toLocaleDateString()}</td>
+                <td className="px-4 py-2">{formatearFecha(c.fecha)}</td>
                 <td className="px-4 py-2">{c.hora_inicio}</td>
                 <td className="px-4 py-2">{c.hora_fin}</td>
                 <td className="px-4 py-2">{c.tema}</td>

@@ -21,6 +21,12 @@ def listar_eventos_sacramentales():
             JOIN personas pe ON mc.id_persona = pe.id_persona
         """)
         eventos = cursor.fetchall()
+        from datetime import time, timedelta
+        for evento in eventos:
+            for campo in ['hora_inicio', 'hora_fin']:
+                valor = evento[campo]
+                if isinstance(valor, (time, timedelta)):
+                    evento[campo] = str(valor)
         cursor.close()
         conn.close()
         return jsonify(eventos)

@@ -140,6 +140,16 @@ function AsistenciaCatequesis() {
     setEditando(null);
   };
 
+  const formatearFecha = (valor) => {
+    return valor
+      ? new Date(valor).toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        })
+      : '-';
+  };
+
   const asistenciasFiltradas = sacramentoFiltro
     ? asistencias.filter(a => String(a.id_sacramento) === String(sacramentoFiltro))
     : asistencias;
@@ -181,7 +191,7 @@ function AsistenciaCatequesis() {
           <option value="">Seleccione Clase</option>
           {clases.map(c => (
             <option key={c.id_clase} value={c.id_clase}>
-              {c.tema} ({new Date(c.fecha).toLocaleDateString()})
+              {c.tema} ({formatearFecha(c.fecha)})
             </option>
           ))}
         </select>
@@ -254,7 +264,7 @@ function AsistenciaCatequesis() {
             {asistenciasFiltradas.length > 0 ? (
               asistenciasFiltradas.map(a => (
                 <tr key={a.id_asistencia}>
-                  <td className="px-4 py-2">{a.tema} ({new Date(a.fecha).toLocaleDateString()})</td>
+                  <td className="px-4 py-2">{a.tema} ({formatearFecha(a.fecha)})</td>
                   <td>{a.catequizando}</td>
                   <td>{a.sacramento || '-'}</td>
                   <td>{a.asistio ? 'Sí' : 'No'}</td>

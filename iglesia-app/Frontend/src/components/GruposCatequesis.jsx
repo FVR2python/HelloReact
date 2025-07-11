@@ -23,7 +23,11 @@ function GruposCatequesis() {
   const formatearFecha = (fechaISO) => {
     if (!fechaISO) return '';
     const fecha = new Date(fechaISO);
-    return fecha.toLocaleDateString('es-PE');
+    return fecha.toLocaleDateString('es-PE', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
   };
 
   const obtenerGrupos = async () => {

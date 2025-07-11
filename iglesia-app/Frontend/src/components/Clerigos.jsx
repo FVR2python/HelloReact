@@ -123,6 +123,16 @@ function Clerigos() {
     setEditando(null);
   };
 
+  const formatearFecha = (valor) => {
+    return valor
+      ? new Date(valor).toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        })
+      : '—';
+  };
+
  return (
   <div className="p-6">
     <h2 className="text-2xl font-bold text-blue-700 mb-6">Gestión de Clérigos</h2>
@@ -215,7 +225,7 @@ function Clerigos() {
                 <td className="px-4 py-2">{c.nombres} {c.apellido1}</td>
                 <td className="px-4 py-2">{c.nombre_jerarquia}</td>
                 <td className="px-4 py-2">
-                  {c.fecha_ordenacion ? new Date(c.fecha_ordenacion).toLocaleDateString('es-PE') : '—'}
+                  {formatearFecha(c.fecha_ordenacion)}
                 </td>
                 <td className="px-4 py-2">
                   <div className="flex justify-center gap-2">

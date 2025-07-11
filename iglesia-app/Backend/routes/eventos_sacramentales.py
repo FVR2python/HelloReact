@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from db.conexion import get_connection
+from datetime import timedelta
 
 sacramentales_bp = Blueprint('sacramentales_bp', __name__)
 
@@ -20,6 +21,20 @@ def listar_eventos():
             JOIN personas pe ON mc.id_persona = pe.id_persona
         """)
         eventos = cursor.fetchall()
+
+        for evento in eventos:
+            for campo in ['hora_inicio', 'hora_fin']:
+                valor = evento[campo]
+                if isinstance(valor, timedelta):
+                    horas = valor.seconds // 3600
+                    minutos = (valor.seconds % 3600) // 60
+                    segundos = valor.seconds % 60
+                    evento[campo] = f"{horas:02}:{minutos:02}:{segundos:02}"
+                elif isinstance(valor, time):
+                    evento[campo] = valor.strftime("%H:%M:%S")
+                elif not isinstance(valor, str):
+                    evento[campo] = str(valor)
+
         cursor.close()
         conn.close()
         return jsonify(eventos)

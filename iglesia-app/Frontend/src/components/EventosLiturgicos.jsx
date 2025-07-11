@@ -120,10 +120,14 @@ function EventosLiturgicos() {
     setEditando(null);
   };
 
-  const formatearFechaHora = (valor) => {
-    return valor ? new Date(valor).toLocaleString('es-PE', {
-      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    }) : '-';
+  const formatearFecha = (valor) => {
+    return valor
+      ? new Date(valor).toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        })
+      : '-';
   };
 
   return (
@@ -179,7 +183,7 @@ function EventosLiturgicos() {
           <div>
             <label className="block text-sm font-medium mb-1">Hora de Inicio</label>
             <input
-              type="datetime-local"
+              type="time"
               name="hora_inicio"
               value={formData.hora_inicio}
               onChange={handleChange}
@@ -191,7 +195,7 @@ function EventosLiturgicos() {
           <div>
             <label className="block text-sm font-medium mb-1">Hora de Fin</label>
             <input
-              type="datetime-local"
+              type="time"
               name="hora_fin"
               value={formData.hora_fin}
               onChange={handleChange}
@@ -249,9 +253,9 @@ function EventosLiturgicos() {
               eventos.map(e => (
                 <tr key={e.id_evento} className="border-t">
                   <td className="px-3 py-2">{e.nombre}</td>
-                  <td className="px-3 py-2">{formatearFechaHora(e.fecha)}</td>
-                  <td className="px-3 py-2">{formatearFechaHora(e.hora_inicio)}</td>
-                  <td className="px-3 py-2">{formatearFechaHora(e.hora_fin)}</td>
+                  <td className="px-3 py-2">{formatearFecha(e.fecha)}</td>
+                  <td className="px-3 py-2">{e.hora_inicio ? e.hora_inicio.slice(0, 5) : '-'}</td>
+                  <td className="px-3 py-2">{e.hora_fin ? e.hora_fin.slice(0, 5) : '-'}</td>
                   <td className="px-3 py-2">{e.nombre_parroquia}</td>
                   <td className="px-3 py-2">
                     <div className="flex justify-center gap-2">

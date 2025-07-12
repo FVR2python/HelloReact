@@ -1,7 +1,15 @@
 from flask import Blueprint, request, jsonify
 from db.conexion import get_connection
+import cv2
+import numpy as np
+import base64
+import os
 
 login_bp = Blueprint('login_bp', __name__)
+
+# Ruta al modelo HaarCascade para detección de rostro
+modelo_path = os.path.join(os.path.dirname(__file__), "..", "modelos", "haarcascade_frontalface_default.xml")
+face_cascade = cv2.CascadeClassifier(modelo_path)
 
 # ======================
 # INICIAR SESIÓN (LOGIN)
@@ -45,6 +53,7 @@ def login():
     except Exception as e:
         return jsonify({"mensaje": f"Error del servidor: {str(e)}"}), 500
 
+
 # ===========================
 # LISTAR CARGOS PARA COMBOBOX
 # ===========================
@@ -60,3 +69,43 @@ def obtener_cargos():
         return jsonify(cargos)
     except Exception as e:
         return jsonify({"mensaje": f"Error al obtener cargos: {str(e)}"}), 500
+
+
+# =====================
+# INICIO DE SESIÓN FACIAL
+# =====================
+@login_bp.route('/api/login_facial', methods=['POST'])
+def login_facial():
+    data = request.get_json()
+    imagen_base64 = data.get('imagen')
+
+    if not imagen_base64:
+        return jsonify({"success": False, "mensaje": "No se recibió la imagen"}), 400
+
+    try:
+        # Procesar imagen base64
+        img_bytes = base64.b64decode(imagen_base64.split(',')[1])
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+
+        if len(faces) == 0:
+            return jsonify({"success": False, "mensaje": "No se detectó ningún rostro"}), 401
+
+        # Aquí podrías hacer comparación con rostros guardados si avanzas a face_recognition
+
+        return jsonify({"success": True,"mensaje": "Rostro detectado. Acceso permitido (simulado)","usuario": {
+        "id_usuario": 1,
+        "username": "valvas",
+        "id_persona": 1,
+        "nombres": "valvas",
+        "apellido1": "admin",
+        "apellido2": "",
+        "id_cargo": 1,
+        "nombre_cargo": "Administrador"}})
+
+
+    except Exception as e:
+        return jsonify({"success": False, "mensaje": f"Error al procesar imagen: {str(e)}"}), 500

@@ -149,7 +149,7 @@ function Menu({ usuario, setUsuario, showMenu = true, setShowMenu }) {
             <input
               type="text"
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Buscar módulo o submódulo..."
+              placeholder="Buscar "
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

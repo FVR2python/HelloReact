@@ -118,107 +118,120 @@ function Usuarios() {
   };
 
 return (
-  <div className="p-6 max-w-7xl mx-auto space-y-6">
+  <div className="space-y-6 p-4">
     <h2 className="text-2xl font-bold text-blue-700">Gestión de Usuarios</h2>
 
     {/* Formulario */}
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div>
-        <label className="label-form">Usuario</label>
-        <input
-          type="text"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          className="input-form"
-          required
-        />
-      </div>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-2xl shadow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+    >
+      <input
+        type="text"
+        name="username"
+        value={formData.username}
+        onChange={handleChange}
+        placeholder="Nombre de usuario *"
+        className="input-form"
+        required
+      />
 
-      <div>
-        <label className="label-form">Contraseña</label>
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          className="input-form"
-          required
-        />
-      </div>
+      <input
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="Contraseña *"
+        className="input-form"
+        required
+      />
 
-      <div>
-        <label className="label-form">Persona</label>
-        <select
-          name="id_persona"
-          value={formData.id_persona}
-          onChange={handleChange}
-          className="input-form"
-          required
-        >
-          <option value="">Seleccione persona</option>
-          {personas.map(p => (
-            <option key={p.id_persona} value={p.id_persona}>
-              {p.nombres} {p.apellido1}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        name="id_persona"
+        value={formData.id_persona}
+        onChange={handleChange}
+        className="input-form"
+        required
+      >
+        <option value="">Seleccione persona</option>
+        {personas.map(p => (
+          <option key={p.id_persona} value={p.id_persona}>
+            {p.nombres} {p.apellido1}
+          </option>
+        ))}
+      </select>
 
-      <div>
-        <label className="label-form">Cargo</label>
-        <select
-          name="id_cargo"
-          value={formData.id_cargo}
-          onChange={handleChange}
-          className="input-form"
-          required
-        >
-          <option value="">Seleccione cargo</option>
-          {cargos.map(c => (
-            <option key={c.id_cargo} value={c.id_cargo}>{c.nombre_cargo}</option>
-          ))}
-        </select>
-      </div>
+      <select
+        name="id_cargo"
+        value={formData.id_cargo}
+        onChange={handleChange}
+        className="input-form"
+        required
+      >
+        <option value="">Seleccione cargo</option>
+        {cargos.map(c => (
+          <option key={c.id_cargo} value={c.id_cargo}>{c.nombre_cargo}</option>
+        ))}
+      </select>
 
-      <div className="flex items-end justify-end gap-3 col-span-full">
+      <div className="col-span-full flex justify-end gap-3 mt-2">
         {editando && (
-          <button type="button" className="btn btn-secondary" onClick={handleCancelar}>Cancelar</button>
+          <button
+            type="button"
+            onClick={handleCancelar}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+          >
+            Cancelar
+          </button>
         )}
-        <button type="submit" className={`btn ${editando ? 'btn-warning' : 'btn-primary'}`}>
+        <button
+          type="submit"
+          className={`px-4 py-2 text-white rounded-lg transition ${editando ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+        >
           {editando ? 'Actualizar' : 'Registrar'}
         </button>
       </div>
     </form>
 
     {/* Tabla */}
-    <div className="bg-white rounded-2xl shadow overflow-x-auto">
-      <h3 className="text-lg font-semibold px-4 pt-4 text-gray-700">Usuarios Registrados</h3>
-      <table className="min-w-full text-sm text-center mt-2">
-        <thead className="bg-blue-600 text-white">
+    <div className="overflow-x-auto rounded-2xl border shadow bg-white">
+      <table className="min-w-full text-sm text-center">
+        <thead className="bg-blue-600 text-white uppercase text-xs">
           <tr>
-            <th className="table-th">Usuario</th>
-            <th className="table-th">Persona</th>
-            <th className="table-th">Cargo</th>
-            <th className="table-th">Acciones</th>
+            <th className="py-3 px-2">Usuario</th>
+            <th className="py-3 px-2">Persona</th>
+            <th className="py-3 px-2">Cargo</th>
+            <th className="py-3 px-2">Acciones</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {usuarios.length > 0 ? usuarios.map(u => (
-            <tr key={u.id_usuario}>
-              <td className="table-td">{u.username}</td>
-              <td className="table-td">{u.nombres} {u.apellido1}</td>
-              <td className="table-td">{u.nombre_cargo}</td>
-              <td className="table-td">
-                <div className="flex justify-center gap-2">
-                  <button onClick={() => handleEditar(u)} className="btn-icon-edit">✏️</button>
-                  <button onClick={() => handleEliminar(u.id_usuario)} className="btn-icon-delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-          )) : (
+          {usuarios.length > 0 ? (
+            usuarios.map(u => (
+              <tr key={u.id_usuario} className="hover:bg-gray-100">
+                <td className="py-2 px-2">{u.username}</td>
+                <td className="py-2 px-2">{u.nombres} {u.apellido1}</td>
+                <td className="py-2 px-2">{u.nombre_cargo}</td>
+                <td className="py-2 px-2 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => handleEditar(u)}
+                    className="text-blue-600 hover:text-blue-800 text-lg"
+                  >
+                    <i className="bi bi-pencil-square"></i>
+                  </button>
+                  <button
+                    onClick={() => handleEliminar(u.id_usuario)}
+                    className="text-red-600 hover:text-red-800 text-lg"
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
             <tr>
-              <td colSpan="4" className="py-4 text-gray-400">No hay usuarios registrados.</td>
+              <td colSpan="4" className="text-center py-4 text-gray-500">
+                No hay usuarios registrados.
+              </td>
             </tr>
           )}
         </tbody>
@@ -226,6 +239,6 @@ return (
     </div>
   </div>
 );
-}
 
+}
 export default Usuarios;

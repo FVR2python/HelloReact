@@ -214,3 +214,26 @@ def eliminar_inscripcion(id_inscripcion):
         return jsonify({"mensaje": "Inscripción eliminada correctamente"})
     except Exception as e:
         return jsonify({"mensaje": f"Error al eliminar inscripción: {str(e)}"}), 500
+    
+# ===============================
+# PERSONAS FILTRADAS POR SACRAMENTO
+# ===============================
+@inscripciones_bp.route('/personas-por-sacramento/<int:id_sacramento>', methods=['GET'])
+def obtener_personas_por_sacramento(id_sacramento):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT DISTINCT p.id_persona, CONCAT(p.nombres, ' ', p.apellido1, ' ', IFNULL(p.apellido2, '')) AS nombre_completo, p.dni
+            FROM personas p
+            JOIN inscripciones_sacramentales i ON p.id_persona = i.id_persona
+            WHERE i.id_sacramento = %s
+            ORDER BY p.nombres ASC
+        """, (id_sacramento,))
+        personas = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify(personas)
+    except Exception as e:
+        return jsonify({"mensaje": f"Error al obtener personas filtradas: {str(e)}"}), 500
+

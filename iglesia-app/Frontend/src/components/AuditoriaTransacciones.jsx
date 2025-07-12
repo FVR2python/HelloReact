@@ -94,108 +94,111 @@ function AuditoriaTransacciones() {
   };
 
 return (
-  <div className="p-6 max-w-7xl mx-auto space-y-6">
+  <div className="space-y-6 p-4">
     <h2 className="text-2xl font-bold text-blue-700">Gestión de Auditoría de Transacciones</h2>
 
     {/* Formulario */}
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div>
-        <label className="label-form">Acción</label>
-        <select
-          name="accion"
-          value={formData.accion}
-          onChange={handleChange}
-          className="input-form"
-          required
-        >
-          <option value="">Seleccione acción</option>
-          <option value="editar">Editar</option>
-          <option value="anular">Anular</option>
-        </select>
-      </div>
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-white p-6 rounded-2xl shadow border">
+      <select
+        name="accion"
+        value={formData.accion}
+        onChange={handleChange}
+        className="input-form"
+        required
+      >
+        <option value="">Seleccione acción</option>
+        <option value="editar">Editar</option>
+        <option value="anular">Anular</option>
+      </select>
 
-      <div>
-        <label className="label-form">Fecha acción</label>
-        <input
-          type="date"
-          name="fecha_accion"
-          value={formData.fecha_accion}
-          onChange={handleChange}
-          className="input-form"
-          required
-        />
-      </div>
+      <input
+        type="date"
+        name="fecha_accion"
+        value={formData.fecha_accion}
+        onChange={handleChange}
+        className="input-form"
+        placeholder="Fecha de acción"
+        required
+      />
 
-      <div>
-        <label className="label-form">Observación</label>
-        <input
-          type="text"
-          name="observacion"
-          value={formData.observacion}
-          onChange={handleChange}
-          className="input-form"
-        />
-      </div>
+      <input
+        type="text"
+        name="observacion"
+        value={formData.observacion}
+        onChange={handleChange}
+        className="input-form"
+        placeholder="Observación"
+      />
 
-      <div>
-        <label className="label-form">Transacción</label>
-        <select
-          name="id_transaccion"
-          value={formData.id_transaccion}
-          onChange={handleChange}
-          className="input-form"
-          required
-        >
-          <option value="">Seleccione transacción</option>
-          {transacciones.map(t => (
-            <option key={t.id_transaccion} value={t.id_transaccion}>
-              {t.descripcion} - S/ {parseFloat(t.monto).toFixed(2)}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        name="id_transaccion"
+        value={formData.id_transaccion}
+        onChange={handleChange}
+        className="input-form"
+        required
+      >
+        <option value="">Seleccione transacción</option>
+        {transacciones.map(t => (
+          <option key={t.id_transaccion} value={t.id_transaccion}>
+            {t.descripcion} - S/ {parseFloat(t.monto).toFixed(2)}
+          </option>
+        ))}
+      </select>
 
-      <div className="flex items-end justify-end gap-3 col-span-full">
+      <div className="col-span-full flex justify-end gap-3 mt-2">
         {editando && (
-          <button type="button" onClick={handleCancelar} className="btn btn-secondary">
+          <button
+            type="button"
+            onClick={handleCancelar}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+          >
             Cancelar
           </button>
         )}
-        <button type="submit" className={`btn ${editando ? 'btn-warning' : 'btn-primary'}`}>
+        <button
+          type="submit"
+          className={`px-4 py-2 text-white rounded-lg transition ${editando ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+        >
           {editando ? 'Actualizar' : 'Registrar'}
         </button>
       </div>
     </form>
 
     {/* Tabla */}
-    <div className="bg-white rounded-2xl shadow overflow-x-auto">
+    <div className="overflow-x-auto rounded-2xl border shadow bg-white">
       <table className="min-w-full text-sm text-center">
-        <thead className="bg-blue-600 text-white">
+        <thead className="bg-blue-600 text-white uppercase text-xs">
           <tr>
-            <th className="table-th">Fecha</th>
-            <th className="table-th">Acción</th>
-            <th className="table-th">Transacción</th>
-            <th className="table-th">Observación</th>
-            <th className="table-th">Acciones</th>
+            <th className="py-3 px-2">Fecha</th>
+            <th className="py-3 px-2">Acción</th>
+            <th className="py-3 px-2">Transacción</th>
+            <th className="py-3 px-2">Observación</th>
+            <th className="py-3 px-2">Acciones</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {auditorias.length > 0 ? auditorias.map(a => (
-            <tr key={a.id_auditoria}>
-              <td className="table-td">{a.fecha_accion}</td>
-              <td className="table-td">{a.accion}</td>
-              <td className="table-td">{a.descripcion_transaccion}</td>
-              <td className="table-td">{a.observacion}</td>
-              <td className="table-td">
-                <div className="flex justify-center gap-2">
-                  <button onClick={() => handleEditar(a)} className="btn-icon-edit">✏️</button>
-                  <button onClick={() => handleEliminar(a.id_auditoria)} className="btn-icon-delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-          )) : (
+        <tbody>
+          {auditorias.length > 0 ? (
+            auditorias.map(a => (
+              <tr key={a.id_auditoria} className="hover:bg-gray-100">
+                <td className="py-2 px-2">{a.fecha_accion}</td>
+                <td className="py-2 px-2 capitalize">{a.accion}</td>
+                <td className="py-2 px-2">{a.descripcion_transaccion}</td>
+                <td className="py-2 px-2">{a.observacion}</td>
+                <td className="py-2 px-2 flex items-center justify-center gap-2">
+                  <button onClick={() => handleEditar(a)} className="text-blue-600 hover:text-blue-800 text-lg">
+                    <i className="bi bi-pencil-square"></i>
+                  </button>
+                  <button onClick={() => handleEliminar(a.id_auditoria)} className="text-red-600 hover:text-red-800 text-lg">
+                    <i className="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
             <tr>
-              <td colSpan="5" className="py-4 text-gray-400">No hay auditorías registradas</td>
+              <td colSpan="5" className="text-center py-4 text-gray-500">
+                No hay auditorías registradas
+              </td>
             </tr>
           )}
         </tbody>

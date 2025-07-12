@@ -33,27 +33,41 @@ function InscripcionesSacramentales() {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-6">Inscripciones Sacramentales</h2>
+    <div className="space-y-6 p-4 fadeIn">
+      <div className="card">
+        <h2 className="text-xl font-bold text-blue-700 mb-4">
+          Inscripciones Sacramentales
+        </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {sacramentos.map((s) => (
-          <div
-            key={s.id_sacramento}
-            className="bg-white rounded-xl shadow-md p-6 flex flex-col justify-between hover:shadow-lg transition"
-          >
-            <div>
-              <h3 className="text-lg font-semibold text-blue-800 mb-2">{s.nombre_sacrament}</h3>
-              <p className="text-sm text-gray-600">{s.descripcion || 'Sin descripción'}</p>
-            </div>
-            <button
-              onClick={() => abrirModal(s)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Gestionar inscripción
-            </button>
-          </div>
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {sacramentos.length > 0 ? (
+            sacramentos.map((s) => (
+              <div
+                key={s.id_sacramento}
+                className="bg-gradient-to-br from-white via-blue-50 to-purple-50 border border-blue-100 rounded-2xl p-6 shadow hover:shadow-md transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <h3 className="text-lg font-semibold text-blue-800 mb-1">
+                    {s.nombre_sacrament}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {s.descripcion || 'Sin descripción'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => abrirModal(s)}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  Gestionar inscripción
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500 text-sm col-span-full text-center">
+              No hay sacramentos registrados.
+            </p>
+          )}
+        </div>
       </div>
 
       {modalAbierto && sacramentoActivo && (

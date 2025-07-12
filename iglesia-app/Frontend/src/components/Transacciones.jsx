@@ -136,125 +136,123 @@ function Transacciones() {
     setEditando(null);
   };
 
-  return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <h2 className="text-2xl font-bold text-blue-700">Gestión de Transacciones</h2>
+return (
+  <div className="space-y-6 p-4">
+    {/* Formulario de transacción */}
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-2xl shadow border">
+      <h2 className="md:col-span-3 text-lg font-bold text-blue-700">
+        {editando ? '✏️ Editar Transacción' : '➕ Registrar nueva Transacción'}
+      </h2>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          ['Monto', 'monto', 'number'],
-          ['Fecha de Transacción', 'fecha_transaccion', 'date'],
-          ['Número de Comprobante', 'num_comprobante'],
-          ['Descripción', 'descripcion']
-        ].map(([label, name, type = 'text']) => (
-          <div key={name}>
-            <label className="label-form">{label}</label>
-            <input type={type} name={name} value={formData[name]} onChange={handleChange} className="input-form" required />
-          </div>
+      <input type="number" name="monto" value={formData.monto} onChange={handleChange} placeholder="Monto *" className="input-form" required />
+      <input type="date" name="fecha_transaccion" value={formData.fecha_transaccion} onChange={handleChange} placeholder="Fecha de Transacción *" className="input-form" required />
+      <input name="num_comprobante" value={formData.num_comprobante} onChange={handleChange} placeholder="Número de Comprobante" className="input-form" />
+
+      <input name="descripcion" value={formData.descripcion} onChange={handleChange} placeholder="Descripción" className="input-form md:col-span-3" />
+
+      <select name="id_parroquia" value={formData.id_parroquia} onChange={handleChange} className="input-form" required>
+        <option value="">Seleccione Parroquia</option>
+        {parroquias.map(p => (
+          <option key={p.id_parroquia} value={p.id_parroquia}>{p.nombre_prrq}</option>
         ))}
+      </select>
 
-        <div>
-          <label className="label-form">Parroquia</label>
-          <select name="id_parroquia" value={formData.id_parroquia} onChange={handleChange} className="input-form" required>
-            <option value="">Seleccione</option>
-            {parroquias.map(p => (
-              <option key={p.id_parroquia} value={p.id_parroquia}>{p.nombre_prrq}</option>
-            ))}
-          </select>
-        </div>
+      <select name="id_tipo_transaccion" value={formData.id_tipo_transaccion} onChange={handleChange} className="input-form" required>
+        <option value="">Seleccione Tipo de Transacción</option>
+        {tipos.map(t => (
+          <option key={t.id_tipo_transaccion} value={t.id_tipo_transaccion}>{t.nombre}</option>
+        ))}
+      </select>
 
-        <div>
-          <label className="label-form">Tipo de Transacción</label>
-          <select name="id_tipo_transaccion" value={formData.id_tipo_transaccion} onChange={handleChange} className="input-form" required>
-            <option value="">Seleccione</option>
-            {tipos.map(t => (
-              <option key={t.id_tipo_transaccion} value={t.id_tipo_transaccion}>{t.nombre}</option>
-            ))}
-          </select>
-        </div>
+      <select name="id_persona" value={formData.id_persona} onChange={handleChange} className="input-form">
+        <option value="">Persona (opcional)</option>
+        {personas.map(p => (
+          <option key={p.id_persona} value={p.id_persona}>{p.nombres} {p.apellido1}</option>
+        ))}
+      </select>
 
-        <div>
-          <label className="label-form">Persona</label>
-          <select name="id_persona" value={formData.id_persona} onChange={handleChange} className="input-form">
-            <option value="">Ninguno</option>
-            {personas.map(p => (
-              <option key={p.id_persona} value={p.id_persona}>{p.nombres} {p.apellido1}</option>
-            ))}
-          </select>
-        </div>
+      <select name="tipo_evento" value={formData.tipo_evento} onChange={handleChange} className="input-form">
+        <option value="">Tipo de Evento</option>
+        <option value="sacramental">Sacramental</option>
+        <option value="liturgico">Litúrgico</option>
+      </select>
 
-        <div>
-          <label className="label-form">Tipo de Evento</label>
-          <select name="tipo_evento" value={formData.tipo_evento} onChange={handleChange} className="input-form">
-            <option value="">Seleccione</option>
-            <option value="sacramental">Sacramental</option>
-            <option value="liturgico">Litúrgico</option>
-          </select>
-        </div>
+      <select name="id_evento" value={formData.id_evento} onChange={handleChange} className="input-form md:col-span-2">
+        <option value="">Seleccione Evento</option>
+        {(formData.tipo_evento === 'sacramental' ? eventosSacra : eventosLiturg).map(e => (
+          <option key={e.id_evento} value={e.id_evento}>
+            {formData.tipo_evento === 'sacramental'
+              ? `${e.nombre_event} - ${new Date(e.fecha_event).toLocaleDateString('es-PE')}`
+              : `${e.nombre} - ${new Date(e.fecha).toLocaleDateString('es-PE')}`}
+          </option>
+        ))}
+      </select>
 
-        <div className="md:col-span-3">
-          <label className="label-form">Evento</label>
-          <select name="id_evento" value={formData.id_evento} onChange={handleChange} className="input-form">
-            <option value="">Seleccione evento</option>
-            {(formData.tipo_evento === 'sacramental' ? eventosSacra : eventosLiturg).map(e => (
-              <option key={e.id_evento} value={e.id_evento}>
-                {formData.tipo_evento === 'sacramental'
-                  ? `${e.nombre_event} - ${new Date(e.fecha_event).toLocaleDateString('es-PE')}`
-                  : `${e.nombre} - ${new Date(e.fecha).toLocaleDateString('es-PE')}`}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="md:col-span-3 flex justify-end gap-3 mt-2">
-          {editando && (
-            <button type="button" onClick={handleCancelar} className="btn btn-secondary">Cancelar</button>
-          )}
-          <button type="submit" className={`btn ${editando ? 'btn-warning' : 'btn-primary'}`}>
-            {editando ? 'Actualizar' : 'Registrar'}
+      <div className="md:col-span-3 flex justify-end gap-3 mt-2">
+        {editando && (
+          <button
+            type="button"
+            onClick={handleCancelar}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+          >
+            Cancelar
           </button>
-        </div>
-      </form>
+        )}
+        <button
+          type="submit"
+          className={`px-4 py-2 text-white rounded-lg transition ${editando ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+        >
+          {editando ? 'Actualizar' : 'Registrar'}
+        </button>
+      </div>
+    </form>
 
-      <div className="bg-white rounded-2xl shadow overflow-x-auto">
-        <table className="min-w-full text-sm text-center">
-          <thead className="bg-blue-600 text-white">
-            <tr>
-              <th className="table-th">Fecha</th>
-              <th className="table-th">Monto</th>
-              <th className="table-th">Comprobante</th>
-              <th className="table-th">Descripción</th>
-              <th className="table-th">Tipo</th>
-              <th className="table-th">Parroquia</th>
-              <th className="table-th">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {transacciones.length > 0 ? transacciones.map(t => (
-              <tr key={t.id_transaccion}>
+    {/* Tabla de transacciones */}
+    <div className="overflow-x-auto rounded-2xl border shadow bg-white">
+      <table className="min-w-full text-sm text-center">
+        <thead className="bg-blue-600 text-white uppercase text-xs">
+          <tr>
+            <th className="py-3 px-2">Fecha</th>
+            <th className="py-3 px-2">Monto</th>
+            <th className="py-3 px-2">Comprobante</th>
+            <th className="py-3 px-2">Descripción</th>
+            <th className="py-3 px-2">Tipo</th>
+            <th className="py-3 px-2">Parroquia</th>
+            <th className="py-3 px-2">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transacciones.length > 0 ? (
+            transacciones.map(t => (
+              <tr key={t.id_transaccion} className="hover:bg-gray-100">
                 <td className="table-td">{new Date(t.fecha_transaccion).toLocaleDateString('es-PE')}</td>
                 <td className="table-td">S/ {parseFloat(t.monto).toFixed(2)}</td>
                 <td className="table-td">{t.num_comprobante}</td>
                 <td className="table-td">{t.descripcion}</td>
                 <td className="table-td">{t.nombre_tipo}</td>
                 <td className="table-td">{t.nombre_parroquia}</td>
-                <td className="table-td">
-                  <div className="flex justify-center gap-2">
-                    <button className="btn-icon-edit" onClick={() => handleEditar(t)}>✏️</button>
-                    <button className="btn-icon-delete" onClick={() => handleEliminar(t.id_transaccion)}>🗑️</button>
-                  </div>
+                <td className="table-td flex items-center justify-center gap-2">
+                  <button onClick={() => handleEditar(t)} className="text-blue-600 hover:text-blue-800 text-lg">
+                    <i className="bi bi-pencil-square"></i>
+                  </button>
+                  <button onClick={() => handleEliminar(t.id_transaccion)} className="text-red-600 hover:text-red-800 text-lg">
+                    <i className="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
-            )) : (
-              <tr>
-                <td colSpan="7" className="py-4 text-gray-400">No hay transacciones registradas</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="7" className="text-center py-4 text-gray-500">
+                No hay transacciones registradas
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
-  );
+  </div>
+);
 }
 
 export default Transacciones;

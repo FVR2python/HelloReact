@@ -4,6 +4,9 @@ import io
 
 actas_bp = Blueprint('actas_bp', __name__)
 
+# ====================
+# GET: Listar Actas
+# ====================
 @actas_bp.route('/actas', methods=['GET'])
 def listar_actas():
     try:
@@ -28,6 +31,9 @@ def listar_actas():
     except Exception as e:
         return jsonify({"mensaje": f"Error al listar actas: {str(e)}"}), 500
 
+# ====================
+# POST: Crear Acta
+# ====================
 @actas_bp.route('/actas', methods=['POST'])
 def crear_acta():
     try:
@@ -52,6 +58,9 @@ def crear_acta():
             return jsonify({"mensaje": "Ya existe un acta o certificado para este evento."}), 409
         return jsonify({"mensaje": f"Error al registrar acta: {msg}"}), 500
 
+# ====================
+# PUT: Actualizar Acta
+# ====================
 @actas_bp.route('/actas/<int:id_acta>', methods=['PUT'])
 def actualizar_acta(id_acta):
     try:
@@ -86,6 +95,9 @@ def actualizar_acta(id_acta):
             return jsonify({"mensaje": "Ya existe un acta o certificado para este evento."}), 409
         return jsonify({"mensaje": f"Error al actualizar acta: {msg}"}), 500
 
+# =========================
+# GET: Descargar Archivo PDF
+# =========================
 @actas_bp.route('/actas/archivo/<int:id_acta>', methods=['GET'])
 def descargar_archivo(id_acta):
     try:
@@ -106,3 +118,19 @@ def descargar_archivo(id_acta):
             return jsonify({"mensaje": "Archivo no encontrado"}), 404
     except Exception as e:
         return jsonify({"mensaje": f"Error al descargar archivo: {str(e)}"}), 500
+
+# ====================
+# DELETE: Eliminar Acta
+# ====================
+@actas_bp.route('/actas/<int:id_acta>', methods=['DELETE'])
+def eliminar_acta(id_acta):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM actas WHERE id_acta = %s", (id_acta,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"mensaje": "Acta eliminada correctamente"})
+    except Exception as e:
+        return jsonify({"mensaje": f"Error al eliminar acta: {str(e)}"}), 500

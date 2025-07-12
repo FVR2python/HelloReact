@@ -111,6 +111,8 @@ function ParticipantesEventosLiturgicos() {
       }
     }
   };
+  const [editando, setEditando] = useState(null);
+
 
   return (
     <div className="p-6">
@@ -192,28 +194,53 @@ function ParticipantesEventosLiturgicos() {
             </tr>
           </thead>
           <tbody>
-            {participantes.length > 0 ? (
-              participantes.map(p => (
-                <tr key={p.id_participante} className="hover:bg-gray-50">
-                  <td className="py-2 px-4">{p.nombre}</td>
-                  <td className="py-2 px-4">{p.nombres} {p.apellido1}</td>
-                  <td className="py-2 px-4">{p.nombre_rol}</td>
-                  <td className="py-2 px-4">
-                    <button
-                      onClick={() => eliminarParticipante(p.id_participante)}
-                      className="text-red-600 border border-red-600 hover:bg-red-600 hover:text-white px-3 py-1 rounded-xl transition"
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="py-4 text-gray-400">No hay participantes registrados.</td>
-              </tr>
-            )}
-          </tbody>
+  {participantes.length > 0 ? (
+    participantes.map(p => (
+      <tr key={p.id_participante} className="hover:bg-gray-50">
+        <td className="py-2 px-4">{p.nombre}</td>
+        <td className="py-2 px-4">{p.nombres} {p.apellido1}</td>
+        <td className="py-2 px-4">{p.nombre_rol}</td>
+        <td className="py-2 px-4 flex justify-center gap-2">
+          <button
+            onClick={() => {
+              setFormData({
+                id_evento_liturgico: p.id_evento_liturgico,
+                id_persona: p.id_persona,
+                id_rol: p.id_rol
+              });
+              setEditando(p.id_participante);
+            }}
+            className="text-yellow-600 border border-yellow-500 hover:bg-yellow-500 hover:text-white px-3 py-1 rounded-xl transition"
+          >
+            Modificar
+          </button>
+          {editando === p.id_participante && (
+            <button
+              onClick={() => {
+                setEditando(null);
+                setFormData({ id_evento_liturgico: '', id_persona: '', id_rol: '' });
+              }}
+              className="text-gray-700 border border-gray-400 hover:bg-gray-400 hover:text-white px-3 py-1 rounded-xl transition"
+            >
+              Cancelar
+            </button>
+          )}
+          <button
+            onClick={() => eliminarParticipante(p.id_participante)}
+            className="text-red-600 border border-red-600 hover:bg-red-600 hover:text-white px-3 py-1 rounded-xl transition"
+          >
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="4" className="py-4 text-gray-400">No hay participantes registrados.</td>
+    </tr>
+  )}
+  </tbody>
+
         </table>
       </div>
     </div>

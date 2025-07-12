@@ -101,111 +101,112 @@ function EgresosMantenimiento() {
   };
 
 return (
-  <div className="p-6 max-w-7xl mx-auto space-y-6">
+  <div className="space-y-6 p-4">
     <h2 className="text-2xl font-bold text-blue-700">Gestión de Egresos de Mantenimiento</h2>
 
     {/* Formulario */}
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div>
-        <label className="label-form">Proveedor</label>
-        <input
-          type="text"
-          name="proveedor"
-          value={formData.proveedor}
-          onChange={handleChange}
-          className="input-form"
-          placeholder="Nombre del proveedor"
-          required
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-2xl shadow border">
+      <input
+        type="text"
+        name="proveedor"
+        value={formData.proveedor}
+        onChange={handleChange}
+        placeholder="Nombre del proveedor *"
+        className="input-form"
+        required
+      />
 
-      <div>
-        <label className="label-form">Descripción</label>
-        <input
-          type="text"
-          name="descripcion"
-          value={formData.descripcion}
-          onChange={handleChange}
-          className="input-form"
-          placeholder="Detalle del egreso"
-        />
-      </div>
+      <input
+        type="text"
+        name="descripcion"
+        value={formData.descripcion}
+        onChange={handleChange}
+        placeholder="Detalle del egreso"
+        className="input-form"
+      />
 
-      <div>
-        <label className="label-form">Objeto Litúrgico</label>
-        <select
-          name="id_inventario"
-          value={formData.id_inventario}
-          onChange={handleChange}
-          className="input-form"
-          required
-        >
-          <option value="">Seleccione objeto</option>
-          {inventario.map(i => (
-            <option key={i.id_inventario} value={i.id_inventario}>
-              {i.nombre_invent}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        name="id_inventario"
+        value={formData.id_inventario}
+        onChange={handleChange}
+        className="input-form"
+        required
+      >
+        <option value="">Seleccione objeto litúrgico</option>
+        {inventario.map(i => (
+          <option key={i.id_inventario} value={i.id_inventario}>{i.nombre_invent}</option>
+        ))}
+      </select>
 
-      <div>
-        <label className="label-form">Transacción Asociada</label>
-        <select
-          name="id_transaccion"
-          value={formData.id_transaccion}
-          onChange={handleChange}
-          className="input-form"
-          required
-        >
-          <option value="">Seleccione transacción</option>
-          {transacciones.map(t => (
-            <option key={t.id_transaccion} value={t.id_transaccion}>
-              {t.descripcion} - S/ {parseFloat(t.monto).toFixed(2)}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        name="id_transaccion"
+        value={formData.id_transaccion}
+        onChange={handleChange}
+        className="input-form"
+        required
+      >
+        <option value="">Seleccione transacción</option>
+        {transacciones.map(t => (
+          <option key={t.id_transaccion} value={t.id_transaccion}>
+            {t.descripcion} - S/ {parseFloat(t.monto).toFixed(2)}
+          </option>
+        ))}
+      </select>
 
       <div className="lg:col-span-3 md:col-span-2 flex justify-end gap-3 mt-2">
         {editando && (
-          <button type="button" onClick={handleCancelar} className="btn btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            onClick={handleCancelar}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+          >
+            Cancelar
+          </button>
         )}
-        <button type="submit" className={`btn ${editando ? 'btn-warning' : 'btn-primary'}`}>
+        <button
+          type="submit"
+          className={`px-4 py-2 text-white rounded-lg transition ${editando ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+        >
           {editando ? 'Actualizar' : 'Registrar'}
         </button>
       </div>
     </form>
 
     {/* Tabla */}
-    <div className="bg-white rounded-2xl shadow overflow-x-auto">
+    <div className="overflow-x-auto rounded-2xl border shadow bg-white">
       <table className="min-w-full text-sm text-center">
-        <thead className="bg-blue-600 text-white">
+        <thead className="bg-blue-600 text-white uppercase text-xs">
           <tr>
-            <th className="table-th">Proveedor</th>
-            <th className="table-th">Objeto</th>
-            <th className="table-th">Transacción</th>
-            <th className="table-th">Descripción</th>
-            <th className="table-th">Acciones</th>
+            <th className="py-3 px-2">Proveedor</th>
+            <th className="py-3 px-2">Objeto</th>
+            <th className="py-3 px-2">Transacción</th>
+            <th className="py-3 px-2">Descripción</th>
+            <th className="py-3 px-2">Acciones</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {egresos.length > 0 ? egresos.map(e => (
-            <tr key={e.id_egreso}>
-              <td className="table-td">{e.proveedor}</td>
-              <td className="table-td">{e.nombre_invent}</td>
-              <td className="table-td">{e.descripcion_transaccion}</td>
-              <td className="table-td">{e.descripcion}</td>
-              <td className="table-td">
-                <div className="flex justify-center gap-2">
-                  <button className="btn-icon-edit" onClick={() => handleEditar(e)}>✏️</button>
-                  <button className="btn-icon-delete" onClick={() => handleEliminar(e.id_egreso)}>🗑️</button>
-                </div>
-              </td>
-            </tr>
-          )) : (
+        <tbody>
+          {egresos.length > 0 ? (
+            egresos.map(e => (
+              <tr key={e.id_egreso} className="hover:bg-gray-100">
+                <td className="py-2 px-2">{e.proveedor}</td>
+                <td className="py-2 px-2">{e.nombre_invent}</td>
+                <td className="py-2 px-2">{e.descripcion_transaccion}</td>
+                <td className="py-2 px-2">{e.descripcion}</td>
+                <td className="py-2 px-2 flex items-center justify-center gap-2">
+                  <button onClick={() => handleEditar(e)} className="text-blue-600 hover:text-blue-800 text-lg">
+                    <i className="bi bi-pencil-square"></i>
+                  </button>
+                  <button onClick={() => handleEliminar(e.id_egreso)} className="text-red-600 hover:text-red-800 text-lg">
+                    <i className="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
             <tr>
-              <td colSpan="5" className="py-4 text-gray-400">No hay egresos registrados</td>
+              <td colSpan="5" className="text-center py-4 text-gray-500">
+                No hay egresos registrados
+              </td>
             </tr>
           )}
         </tbody>

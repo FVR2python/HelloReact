@@ -43,7 +43,7 @@ import AuditoriaTransacciones from './components/AuditoriaTransacciones';
 import TiposTransacciones from './components/TiposTransacciones';
 import SacramentosPrecios from './components/SacramentosPrecios';
 
-import './css/style.css';
+
 
 
 function App() {

@@ -33,8 +33,6 @@ from routes.participantes_sacramentales import participantes_sacramentales_bp
 from routes.participantes_liturgicos import participantes_liturgicos
 from routes.eventos_liturgicos import eventos_liturgicos_bp
 from routes.crud_eventos_sacramentales import crud_eventos_sacramentales_bp
-from routes.evaluaciones_catequesis import evaluaciones_bp
-
 
 
 app = Flask(__name__)
@@ -68,7 +66,7 @@ app.register_blueprint(participantes_sacramentales_bp)
 app.register_blueprint(participantes_liturgicos)
 app.register_blueprint(eventos_liturgicos_bp)
 app.register_blueprint(crud_eventos_sacramentales_bp)
-app.register_blueprint(evaluaciones_bp)
+
 
 
 @app.route('/')

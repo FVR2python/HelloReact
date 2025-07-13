@@ -60,13 +60,13 @@ def crear_persona():
         cursor = conn.cursor(dictionary=True)
         query = """
             INSERT INTO personas 
-            (dni, nombres, apellido1, apellido2, email, fecha_nacimiento, direccion, telefono, estado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 1)
+            (dni, nombres, apellido1, apellido2, email, fecha_nacimiento, direccion, telefono, genero, estado)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 1)
         """
         valores = (
             data['dni'], data['nombres'], data['apellido1'], data.get('apellido2', ''),
             data.get('email', ''), data['fecha_nacimiento'], data.get('direccion', ''),
-            data['telefono']
+            data['telefono'], data.get('genero', 'No especificado')
         )
         cursor.execute(query, valores)
         conn.commit()
@@ -104,13 +104,13 @@ def actualizar_persona(id_persona):
         query = """
             UPDATE personas 
             SET dni=%s, nombres=%s, apellido1=%s, apellido2=%s, email=%s,
-                fecha_nacimiento=%s, direccion=%s, telefono=%s
+                fecha_nacimiento=%s, direccion=%s, telefono=%s, genero=%s
             WHERE id_persona = %s
         """
         valores = (
             data['dni'], data['nombres'], data['apellido1'], data.get('apellido2', ''),
             data.get('email', ''), data['fecha_nacimiento'], data.get('direccion', ''),
-            data['telefono'], id_persona
+            data['telefono'], data.get('genero', 'No especificado'), id_persona
         )
         cursor.execute(query, valores)
         conn.commit()

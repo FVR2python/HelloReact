@@ -19,73 +19,91 @@ function SacramentosPrecios() {
 
   const obtenerSacramentos = async () => {
     const res = await fetch('http://localhost:5000/sacramentos');
-    const data = await res.json();
-    setSacramentos(data);
+    setSacramentos(await res.json());
   };
 
   const obtenerPrecios = async () => {
     const res = await fetch('http://localhost:5000/precios');
-    const data = await res.json();
-    setPrecios(data);
+    setPrecios(await res.json());
   };
 
   const obtenerRelaciones = async () => {
     const res = await fetch('http://localhost:5000/sacramento-precios');
-    const data = await res.json();
-    setRelaciones(data);
+    setRelaciones(await res.json());
   };
 
   const handleChange = (e, setForm, form) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const registrarSacramento = async (e) => {
+  const registrarSacramento = async e => {
     e.preventDefault();
-    const res = await fetch('http://localhost:5000/sacramentos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formSacramento)
-    });
-    if (res.ok) {
-      obtenerSacramentos();
-      setFormSacramento({ nombre_sacrament: '', descripcion: '' });
-      Swal.fire('Éxito', 'Sacramento registrado', 'success');
-      setPaso(2);
+    try {
+      const res = await fetch('http://localhost:5000/sacramentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formSacramento)
+      });
+      if (res.ok) {
+        await obtenerSacramentos();
+        setFormSacramento({ nombre_sacrament: '', descripcion: '' });
+        Swal.fire('Éxito', 'Sacramento registrado', 'success');
+        setPaso(2);
+      } else {
+        const error = await res.json();
+        Swal.fire('Error', error.mensaje || 'Error al registrar sacramento', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Servidor no disponible', 'error');
     }
   };
 
-  const registrarPrecio = async (e) => {
+  const registrarPrecio = async e => {
     e.preventDefault();
-    const res = await fetch('http://localhost:5000/precios', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formPrecio)
-    });
-    if (res.ok) {
-      obtenerPrecios();
-      setFormPrecio({ monto_base: '', fecha_inicio: '' });
-      Swal.fire('Éxito', 'Precio registrado', 'success');
-      setPaso(3);
+    try {
+      const res = await fetch('http://localhost:5000/precios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formPrecio)
+      });
+      if (res.ok) {
+        await obtenerPrecios();
+        setFormPrecio({ monto_base: '', fecha_inicio: '' });
+        Swal.fire('Éxito', 'Precio registrado', 'success');
+        setPaso(3);
+      } else {
+        const error = await res.json();
+        Swal.fire('Error', error.mensaje || 'Error al registrar precio', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Servidor no disponible', 'error');
     }
   };
 
-  const registrarRelacion = async (e) => {
+  const registrarRelacion = async e => {
     e.preventDefault();
-    const res = await fetch('http://localhost:5000/sacramento-precios', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formRelacion)
-    });
-    if (res.ok) {
-      obtenerRelaciones();
-      setFormRelacion({ id_sacramento: '', id_precio: '' });
-      Swal.fire('Éxito', 'Asociación registrada', 'success');
-      setPaso(1);
+    try {
+      const res = await fetch('http://localhost:5000/sacramento-precios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formRelacion)
+      });
+      if (res.ok) {
+        await obtenerRelaciones();
+        setFormRelacion({ id_sacramento: '', id_precio: '' });
+        Swal.fire('Éxito', 'Asociación registrada', 'success');
+        setPaso(1);
+      } else {
+        const error = await res.json();
+        Swal.fire('Error', error.mensaje || 'Error al asociar sacramento con precio', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Servidor no disponible', 'error');
     }
   };
 
-  const eliminarRelacion = async (id) => {
-    const result = await Swal.fire({
+  const eliminarRelacion = async id => {
+    const confirm = await Swal.fire({
       title: '¿Eliminar relación?',
       text: 'Esta acción no se puede deshacer',
       icon: 'warning',
@@ -93,61 +111,58 @@ function SacramentosPrecios() {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     });
-    if (result.isConfirmed) {
-      const res = await fetch(`http://localhost:5000/sacramento-precios/${id}`, {
-        method: 'DELETE'
-      });
+    if (confirm.isConfirmed) {
+      const res = await fetch(`http://localhost:5000/sacramento-precios/${id}`, { method: 'DELETE' });
       if (res.ok) {
         obtenerRelaciones();
         Swal.fire('Eliminado', 'La relación ha sido eliminada', 'success');
+      } else {
+        Swal.fire('Error', 'No se pudo eliminar', 'error');
       }
     }
   };
 
   return (
-    <div className="p-6 bg-gray-100 rounded-2xl shadow-md">
-      <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center">Gestión de Sacramentos y Precios</h2>
+    <div className="p-6 space-y-6 bg-gray-100 rounded-2xl shadow-md">
+      <h2 className="text-2xl font-bold text-blue-700 text-center">Gestión de Sacramentos y Precios</h2>
 
-      {/* Indicador de pasos */}
-      <div className="flex justify-center gap-4 mb-6">
+      {/* Pasos */}
+      <div className="flex justify-center gap-4">
         {[1, 2, 3].map(n => (
-          <div
-            key={n}
-            className={`px-4 py-2 rounded-full border font-semibold transition-all ${paso === n ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border-blue-300'}`}
-          >
+          <span key={n} className={`px-4 py-2 rounded-full text-sm font-semibold border ${paso === n ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border-blue-400'}`}>
             Paso {n}
-          </div>
+          </span>
         ))}
       </div>
 
       {/* Paso 1: Sacramento */}
       {paso === 1 && (
-        <form onSubmit={registrarSacramento} className="bg-white p-6 rounded-xl shadow mb-6 border border-gray-200">
-          <h3 className="text-lg font-bold mb-4">1️⃣ Registrar Sacramento</h3>
+        <form onSubmit={registrarSacramento} className="form-section">
+          <h3 className="mb-4 text-lg font-bold">1️⃣ Registrar Sacramento</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input type="text" name="nombre_sacrament" placeholder="Nombre del sacramento" required value={formSacramento.nombre_sacrament} onChange={(e) => handleChange(e, setFormSacramento, formSacramento)} className="input-form" />
+            <input type="text" name="nombre_sacrament" placeholder="Nombre *" required value={formSacramento.nombre_sacrament} onChange={(e) => handleChange(e, setFormSacramento, formSacramento)} className="input-form" />
             <input type="text" name="descripcion" placeholder="Descripción" value={formSacramento.descripcion} onChange={(e) => handleChange(e, setFormSacramento, formSacramento)} className="input-form" />
           </div>
-          <button type="submit" className="mt-4 btn bg-blue-600 text-white">Guardar y continuar</button>
+          <button type="submit" className="btn bg-blue-600 mt-4 text-white">Guardar y continuar</button>
         </form>
       )}
 
       {/* Paso 2: Precio */}
       {paso === 2 && (
-        <form onSubmit={registrarPrecio} className="bg-white p-6 rounded-xl shadow mb-6 border border-gray-200">
-          <h3 className="text-lg font-bold mb-4">2️⃣ Registrar Precio</h3>
+        <form onSubmit={registrarPrecio} className="form-section">
+          <h3 className="mb-4 text-lg font-bold">2️⃣ Registrar Precio</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input type="number" step="0.01" name="monto_base" placeholder="Monto base" required value={formPrecio.monto_base} onChange={(e) => handleChange(e, setFormPrecio, formPrecio)} className="input-form" />
+            <input type="number" step="0.01" name="monto_base" required placeholder="Monto base *" value={formPrecio.monto_base} onChange={(e) => handleChange(e, setFormPrecio, formPrecio)} className="input-form" />
             <input type="datetime-local" name="fecha_inicio" required value={formPrecio.fecha_inicio} onChange={(e) => handleChange(e, setFormPrecio, formPrecio)} className="input-form" />
           </div>
-          <button type="submit" className="mt-4 btn bg-blue-600 text-white">Guardar y continuar</button>
+          <button type="submit" className="btn bg-blue-600 mt-4 text-white">Guardar y continuar</button>
         </form>
       )}
 
       {/* Paso 3: Asociación */}
       {paso === 3 && (
-        <form onSubmit={registrarRelacion} className="bg-white p-6 rounded-xl shadow mb-6 border border-gray-200">
-          <h3 className="text-lg font-bold mb-4">3️⃣ Asociar Sacramento con Precio</h3>
+        <form onSubmit={registrarRelacion} className="form-section">
+          <h3 className="mb-4 text-lg font-bold">3️⃣ Asociar Sacramento con Precio</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <select name="id_sacramento" required value={formRelacion.id_sacramento} onChange={(e) => handleChange(e, setFormRelacion, formRelacion)} className="input-form">
               <option value="">Seleccione sacramento</option>
@@ -158,38 +173,43 @@ function SacramentosPrecios() {
             <select name="id_precio" required value={formRelacion.id_precio} onChange={(e) => handleChange(e, setFormRelacion, formRelacion)} className="input-form">
               <option value="">Seleccione precio</option>
               {precios.map(p => (
-                <option key={p.id_precio} value={p.id_precio}>S/ {parseFloat(p.monto_base).toFixed(2)} desde {new Date(p.fecha_inicio).toLocaleString()}</option>
+                <option key={p.id_precio} value={p.id_precio}>
+                  S/ {parseFloat(p.monto_base).toFixed(2)} - Desde: {new Date(p.fecha_inicio).toLocaleString()}
+                </option>
               ))}
             </select>
           </div>
-          <button type="submit" className="mt-4 btn bg-blue-600 text-white">Finalizar</button>
+          <button type="submit" className="btn bg-blue-600 mt-4 text-white">Finalizar</button>
         </form>
       )}
 
       {/* Tabla de relaciones */}
-      <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-blue-100 text-blue-800 text-center">
+      <div className="overflow-x-auto bg-white rounded-xl shadow border">
+        <table className="w-full text-sm text-center">
+          <thead className="bg-blue-100 text-blue-800">
             <tr>
-              <th className="px-4 py-2">Sacramento</th>
-              <th className="px-4 py-2">Precio</th>
-              <th className="px-4 py-2">Acciones</th>
+              <th className="py-2 px-4">Sacramento</th>
+              <th className="py-2 px-4">Precio</th>
+              <th className="py-2 px-4">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {relaciones.length > 0 ? relaciones.map(r => (
-              <tr key={r.id_relacion} className="text-center border-t">
-                <td className="px-4 py-2">{r.nombre_sacrament}</td>
-                <td className="px-4 py-2">S/ {parseFloat(r.monto_base).toFixed(2)}<br /><span className="text-xs text-gray-500">Desde: {new Date(r.fecha_inicio).toLocaleString()}</span></td>
-                <td className="px-4 py-2">
-                  <button className="text-red-600 hover:text-red-800" onClick={() => eliminarRelacion(r.id_relacion)}>
+              <tr key={r.id_relacion} className="border-t">
+                <td className="py-2 px-4">{r.nombre_sacrament}</td>
+                <td className="py-2 px-4">
+                  S/ {parseFloat(r.monto_base).toFixed(2)}<br />
+                  <span className="text-xs text-gray-500">Desde: {new Date(r.fecha_inicio).toLocaleString()}</span>
+                </td>
+                <td className="py-2 px-4">
+                  <button onClick={() => eliminarRelacion(r.id_relacion)} className="text-red-600 hover:text-red-800">
                     <i className="bi bi-trash"></i>
                   </button>
                 </td>
               </tr>
             )) : (
               <tr>
-                <td colSpan="3" className="text-center text-gray-400 py-4">No hay relaciones registradas.</td>
+                <td colSpan="3" className="py-4 text-gray-400">No hay relaciones registradas.</td>
               </tr>
             )}
           </tbody>

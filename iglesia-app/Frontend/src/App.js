@@ -20,7 +20,6 @@ import Personas from './components/Personas';
 import GruposCatequesis from './components/GruposCatequesis';
 import ClasesCatequesis from './components/ClasesCatequesis';
 import AsistenciaCatequesis from './components/AsistenciaCatequesis';
-import EvaluacionesCatequesis from './components/EvaluacionesCatequesis';
 
 // Sacramentos
 import InscripcionesSacramentales from './components/InscripcionesSacramentales';
@@ -41,7 +40,6 @@ import EgresosMantenimiento from './components/EgresosMantenimiento';
 import AuditoriaTransacciones from './components/AuditoriaTransacciones';
 
 // Configuración
-import Parroquias from './components/Parroquias';
 import TiposTransacciones from './components/TiposTransacciones';
 import SacramentosPrecios from './components/SacramentosPrecios';
 
@@ -89,7 +87,6 @@ function App() {
             <Route path="/catequesis/grupos" element={<GruposCatequesis />} />
             <Route path="/catequesis/clases" element={<ClasesCatequesis />} />
             <Route path="/catequesis/asistencia" element={<AsistenciaCatequesis />} />
-            <Route path="/catequesis/evaluacion" element={<EvaluacionesCatequesis />} />
 
             {/* Liturgia e inventario */}
             <Route path="/liturgia/eventos" element={<EventosLiturgicos />} />
@@ -114,7 +111,6 @@ function App() {
 
             {/* Configuración */}
             <Route path="/config/sacramentos" element={<SacramentosPrecios />} />
-            <Route path="/config/parroquias" element={<Parroquias />} />
             <Route path="/config/tipos-transaccion" element={<TiposTransacciones />} />
 
             {/* Perfil */}

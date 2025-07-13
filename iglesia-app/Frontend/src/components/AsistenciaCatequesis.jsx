@@ -56,7 +56,13 @@ function AsistenciaCatequesis() {
     try {
       const res = await fetch('http://localhost:5000/sacramentos-catequesis');
       const data = await res.json();
-      setSacramentos(Array.isArray(data) ? data : []);
+      if (Array.isArray(data)) {
+        const filtrados = data.filter(s => {
+          const nombre = s.nombre_sacrament.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          return nombre.includes('primera comunion') || nombre.includes('confirmacion');
+        });
+        setSacramentos(filtrados);
+      }
     } catch {
       Swal.fire('Error', 'No se pudieron cargar los sacramentos', 'error');
     }

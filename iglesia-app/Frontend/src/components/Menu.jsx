@@ -61,7 +61,6 @@ function Menu({ usuario, setUsuario, showMenu = true, setShowMenu }) {
         { label: 'Grupos de catequesis', path: '/catequesis/grupos' },
         { label: 'Clases programadas', path: '/catequesis/clases' },
         { label: 'Registro de asistencia', path: '/catequesis/asistencia' },
-        { label: 'Evaluaciones', path: '/catequesis/evaluacion' }
       ],
       visibleTo: ['administrador', 'catequista']
     },
@@ -112,7 +111,6 @@ function Menu({ usuario, setUsuario, showMenu = true, setShowMenu }) {
       label: 'Configuración del Sistema',
       icon: 'bi-gear',
       subItems: [
-        { label: 'Parroquias registradas', path: '/config/parroquias' },
         { label: 'Sacramentos y precios', path: '/config/sacramentos' },
         { label: 'Tipos de operación', path: '/config/tipos-transaccion' }
       ],

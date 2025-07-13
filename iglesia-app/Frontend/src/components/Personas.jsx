@@ -11,7 +11,8 @@ function Personas() {
     email: '',
     fecha_nacimiento: '',
     direccion: '',
-    telefono: ''
+    telefono: '',
+    genero: 'No especificado'
   });
   const [editando, setEditando] = useState(null);
 
@@ -23,14 +24,12 @@ function Personas() {
     try {
       const res = await fetch('http://localhost:5000/personas');
       const data = await res.json();
-      console.log('Datos recibidos:', data);
       if (Array.isArray(data)) {
         setPersonas(data);
       } else {
         throw new Error('Respuesta inesperada del servidor');
       }
     } catch (error) {
-      console.error('Error al obtener personas:', error);
       Swal.fire('Error', 'No se pudieron cargar las personas', 'error');
     }
   };
@@ -56,14 +55,8 @@ function Personas() {
       if (res.ok) {
         Swal.fire('Éxito', data.mensaje, 'success');
         setFormData({
-          dni: '',
-          nombres: '',
-          apellido1: '',
-          apellido2: '',
-          email: '',
-          fecha_nacimiento: '',
-          direccion: '',
-          telefono: ''
+          dni: '', nombres: '', apellido1: '', apellido2: '', email: '',
+          fecha_nacimiento: '', direccion: '', telefono: '', genero: 'No especificado'
         });
         setEditando(null);
         obtenerPersonas();
@@ -71,7 +64,6 @@ function Personas() {
         Swal.fire('Error', data.mensaje, 'error');
       }
     } catch (error) {
-      console.error('Error al guardar persona:', error);
       Swal.fire('Error', 'Hubo un problema al guardar la persona', 'error');
     }
   };
@@ -104,7 +96,6 @@ function Personas() {
           Swal.fire('Error', data.mensaje, 'error');
         }
       } catch (error) {
-        console.error('Error al eliminar persona:', error);
         Swal.fire('Error', 'No se pudo eliminar la persona', 'error');
       }
     }
@@ -118,14 +109,47 @@ function Personas() {
           {editando ? '✏️ Editar persona' : '➕ Registrar nueva persona'}
         </h2>
 
-        <input name="dni" value={formData.dni} onChange={handleChange} placeholder="DNI *" className="input-form" required />
-        <input name="nombres" value={formData.nombres} onChange={handleChange} placeholder="Nombres *" className="input-form" required />
-        <input name="apellido1" value={formData.apellido1} onChange={handleChange} placeholder="Apellido Paterno *" className="input-form" required />
-        <input name="apellido2" value={formData.apellido2} onChange={handleChange} placeholder="Apellido Materno" className="input-form" />
-        <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Correo electrónico" className="input-form" />
-        <input name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleChange} placeholder="Fecha de nacimiento *" className="input-form" required />
-        <input name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="input-form" />
-        <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono *" className="input-form" required />
+        <div>
+          <label className="text-sm font-medium">DNI *</label>
+          <input name="dni" value={formData.dni} onChange={handleChange} className="input-form" required />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Nombres *</label>
+          <input name="nombres" value={formData.nombres} onChange={handleChange} className="input-form" required />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Apellido Paterno *</label>
+          <input name="apellido1" value={formData.apellido1} onChange={handleChange} className="input-form" required />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Apellido Materno</label>
+          <input name="apellido2" value={formData.apellido2} onChange={handleChange} className="input-form" />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Correo electrónico</label>
+          <input name="email" type="email" value={formData.email} onChange={handleChange} className="input-form" />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Fecha de nacimiento *</label>
+          <input name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleChange} className="input-form" required />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Dirección</label>
+          <input name="direccion" value={formData.direccion} onChange={handleChange} className="input-form" />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Teléfono *</label>
+          <input name="telefono" value={formData.telefono} onChange={handleChange} className="input-form" required />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Género</label>
+          <select name="genero" value={formData.genero} onChange={handleChange} className="input-form">
+            <option value="No especificado">No especificado</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
 
         <div className="md:col-span-3 flex justify-end gap-3 mt-2">
           <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
@@ -136,16 +160,7 @@ function Personas() {
               type="button"
               onClick={() => {
                 setEditando(null);
-                setFormData({
-                  dni: '',
-                  nombres: '',
-                  apellido1: '',
-                  apellido2: '',
-                  email: '',
-                  fecha_nacimiento: '',
-                  direccion: '',
-                  telefono: ''
-                });
+                setFormData({ dni: '', nombres: '', apellido1: '', apellido2: '', email: '', fecha_nacimiento: '', direccion: '', telefono: '', genero: 'No especificado' });
               }}
               className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
             >
@@ -155,7 +170,7 @@ function Personas() {
         </div>
       </form>
 
-      {/* Tabla de personas */}
+      {/* Tabla */}
       <div className="overflow-x-auto rounded-2xl border shadow bg-white">
         <table className="min-w-full text-sm text-center">
           <thead className="bg-blue-600 text-white uppercase text-xs">
@@ -163,6 +178,7 @@ function Personas() {
               <th className="py-3 px-2">DNI</th>
               <th className="py-3 px-2">Nombre completo</th>
               <th className="py-3 px-2">Fecha nacimiento</th>
+              <th className="py-3 px-2">Género</th>
               <th className="py-3 px-2">Teléfono</th>
               <th className="py-3 px-2">Correo</th>
               <th className="py-3 px-2">Dirección</th>
@@ -175,13 +191,8 @@ function Personas() {
                 <tr key={p.id_persona} className="hover:bg-gray-100">
                   <td className="table-td">{p.dni}</td>
                   <td className="table-td">{`${p.nombres} ${p.apellido1} ${p.apellido2}`}</td>
-                  <td className="table-td">
-                    {new Date(p.fecha_nacimiento).toLocaleDateString('es-PE', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    })}
-                  </td>
+                  <td className="table-td">{new Date(p.fecha_nacimiento).toLocaleDateString('es-PE')}</td>
+                  <td className="table-td">{p.genero}</td>
                   <td className="table-td">{p.telefono}</td>
                   <td className="table-td">{p.email}</td>
                   <td className="table-td">{p.direccion}</td>
@@ -197,7 +208,7 @@ function Personas() {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-4 text-gray-500">
+                <td colSpan="8" className="text-center py-4 text-gray-500">
                   No hay personas registradas
                 </td>
               </tr>

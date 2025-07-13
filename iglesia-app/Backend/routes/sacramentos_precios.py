@@ -98,6 +98,15 @@ def registrar_sacramento_precio():
     try:
         conn = get_connection()
         cursor = conn.cursor()
+
+        # Verificar si ya existe esa relación
+        cursor.execute("""
+            SELECT COUNT(*) FROM sacramento_precios
+            WHERE id_sacramento = %s AND id_precio = %s
+        """, (data['id_sacramento'], data['id_precio']))
+        if cursor.fetchone()[0] > 0:
+            return jsonify({"mensaje": "La relación ya existe."}), 409
+
         cursor.execute("""
             INSERT INTO sacramento_precios (id_sacramento, id_precio)
             VALUES (%s, %s)
@@ -121,3 +130,29 @@ def eliminar_sacramento_precio(id_relacion):
         return jsonify({"mensaje": "Relación eliminada correctamente"})
     except Exception as e:
         return jsonify({"mensaje": f"Error al eliminar relación: {str(e)}"}), 500
+
+# =====================
+# PRECIO VIGENTE POR SACRAMENTO
+# =====================
+@sacramentos_precios_bp.route('/sacramento-precios/vigente/<int:id_sacramento>', methods=['GET'])
+def obtener_precio_vigente(id_sacramento):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT p.monto_base 
+            FROM sacramento_precios sp
+            JOIN precios p ON sp.id_precio = p.id_precio
+            WHERE sp.id_sacramento = %s
+            ORDER BY p.fecha_inicio DESC
+            LIMIT 1
+        """, (id_sacramento,))
+        data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if data:
+            return jsonify(data), 200
+        else:
+            return jsonify({"mensaje": "No se encontró precio vigente"}), 404
+    except Exception as e:
+        return jsonify({"mensaje": f"Error al obtener precio vigente: {str(e)}"}), 500

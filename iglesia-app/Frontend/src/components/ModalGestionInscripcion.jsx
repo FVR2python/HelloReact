@@ -8,24 +8,31 @@ function ModalGestionInscripcion({ sacramento, onClose }) {
   const [padrinos, setPadrinos] = useState([]);
   const [madrinas, setMadrinas] = useState([]);
   const [editando, setEditando] = useState(null);
-  const [mostrarEvaluacionOral, setMostrarEvaluacionOral] = useState(false);
-  const [esMatrimonio, setEsMatrimonio] = useState(false);
   const [cerrando, setCerrando] = useState(false);
+  const [mostrarPadrinos, setMostrarPadrinos] = useState(false);
+  const [mostrarConyuge, setMostrarConyuge] = useState(false);
 
   const [formData, setFormData] = useState({
     id_persona: '',
     fecha_matricula: '',
-    fecha_ceremonia_acordada: '',
-    evaluacion_oral: '',
     descripcion: '',
     estado_matricula: 1,
-    tipo_matrimonio: '',
     id_padrino: '',
     id_madrina: '',
     observaciones_matrimonio: '',
     id_sacramento: '',
     id_persona_rol_conyuge: ''
   });
+
+  const obtenerInscripciones = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:5000/inscripciones');
+      const data = await res.json();
+      setInscripciones(data);
+    } catch (error) {
+      console.error('Error al obtener inscripciones:', error);
+    }
+  }, []);
 
   const obtenerPersonasPorSacramento = useCallback(async () => {
     try {
@@ -43,7 +50,7 @@ function ModalGestionInscripcion({ sacramento, onClose }) {
       const data = await res.json();
       setConyuges(data);
     } catch (error) {
-      console.error('Error al obtener cónyuges:', error);
+      console.error('Error al obtener conyuges:', error);
     }
   }, []);
 
@@ -67,25 +74,19 @@ function ModalGestionInscripcion({ sacramento, onClose }) {
     }
   }, []);
 
-  const obtenerInscripciones = useCallback(async () => {
-    try {
-      const res = await fetch('http://localhost:5000/inscripciones');
-      const data = await res.json();
-      setInscripciones(data.filter(ins => ins.id_sacramento === sacramento.id_sacramento));
-    } catch (error) {
-      console.error('Error al obtener inscripciones:', error);
-    }
-  }, [sacramento]);
-
   useEffect(() => {
     if (!sacramento) return;
 
-    const nombreNormalizado = sacramento.nombre_sacrament.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const requiereEvaluacion = ['bautizo', 'primera comunion', 'confirmacion', 'matrimonio'].some(keyword =>
-      nombreNormalizado.includes(keyword)
-    );
-    setMostrarEvaluacionOral(requiereEvaluacion);
-    setEsMatrimonio(nombreNormalizado.includes('matrimonio'));
+    const nombre = sacramento.nombre_sacrament
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+    const sacramentosConPadrinos = ['matrimonio', 'bautizo', 'bautismo', 'confirmacion', 'primera comunion'];
+    const sacramentosConConyuge = ['matrimonio'];
+
+    setMostrarPadrinos(sacramentosConPadrinos.some(s => nombre.includes(s)));
+    setMostrarConyuge(sacramentosConConyuge.some(s => nombre.includes(s)));
 
     obtenerPersonasPorSacramento();
     obtenerConyuges();
@@ -104,16 +105,17 @@ function ModalGestionInscripcion({ sacramento, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const payload = {
-      ...formData,
-      id_sacramento: sacramento.id_sacramento,
-      evaluacion_oral: mostrarEvaluacionOral ? formData.evaluacion_oral : 'Sin evaluación oral'
-    };
+    const payload = { ...formData, id_sacramento: sacramento.id_sacramento };
 
     try {
-      const res = await fetch('http://localhost:5000/inscripciones', {
-        method: 'POST',
+      const url = editando
+        ? `http://localhost:5000/inscripciones/${editando}`
+        : 'http://localhost:5000/inscripciones';
+
+      const method = editando ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
@@ -124,23 +126,50 @@ function ModalGestionInscripcion({ sacramento, onClose }) {
         setFormData({
           id_persona: '',
           fecha_matricula: '',
-          fecha_ceremonia_acordada: '',
-          evaluacion_oral: '',
           descripcion: '',
           estado_matricula: 1,
-          tipo_matrimonio: '',
           id_padrino: '',
           id_madrina: '',
           observaciones_matrimonio: '',
           id_sacramento: '',
           id_persona_rol_conyuge: ''
         });
+        setEditando(null);
         obtenerInscripciones();
       } else {
         Swal.fire('Error', data.mensaje, 'error');
       }
     } catch (error) {
       Swal.fire('Error', 'Hubo un problema al registrar la inscripción', 'error');
+    }
+  };
+
+  const eliminarInscripcion = async (id) => {
+    const confirmacion = await Swal.fire({
+      title: '¿Eliminar inscripción?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (confirmacion.isConfirmed) {
+      try {
+        const res = await fetch(`http://localhost:5000/inscripciones/${id}`, {
+          method: 'DELETE'
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          Swal.fire('Eliminado', data.mensaje, 'success');
+          obtenerInscripciones();
+        } else {
+          Swal.fire('Error', data.mensaje, 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'No se pudo eliminar la inscripción', 'error');
+      }
     }
   };
 
@@ -157,11 +186,8 @@ function ModalGestionInscripcion({ sacramento, onClose }) {
     setFormData({
       id_persona: inscripcion.id_persona,
       fecha_matricula: inscripcion.fecha_matricula?.split('T')[0] || '',
-      fecha_ceremonia_acordada: inscripcion.fecha_ceremonia_acordada?.split('T')[0] || '',
-      evaluacion_oral: inscripcion.evaluacion_oral || '',
       descripcion: inscripcion.descripcion || '',
       estado_matricula: inscripcion.estado_matricula,
-      tipo_matrimonio: inscripcion.tipo_matrimonio || '',
       id_padrino: inscripcion.id_padrino || '',
       id_madrina: inscripcion.id_madrina || '',
       observaciones_matrimonio: inscripcion.observaciones_matrimonio || '',
@@ -170,153 +196,176 @@ function ModalGestionInscripcion({ sacramento, onClose }) {
     });
   };
 
+
 return (
-  <div className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${cerrando ? 'animate-fadeOut' : 'animate-fadeIn'} bg-black/50`}>
-    <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto mx-4 md:mx-auto card animate-slideDown">
-      {/* Encabezado */}
-      <div className="flex justify-between items-center border-b pb-2 mb-4">
-        <h2 className="text-xl font-bold text-indigo-700">
-          Gestionar Inscripción: {sacramento?.nombre_sacrament}
-        </h2>
-        <button onClick={handleClose} className="text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
-      </div>
+  <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ${cerrando ? 'animate-fadeOut' : 'animate-fadeIn'}`}>
+    <div className={`bg-white rounded-2xl shadow-xl p-6 w-full max-w-6xl relative animate-slideDown`}>
+      <button onClick={handleClose} className="absolute top-2 right-4 text-gray-600 hover:text-red-500 text-2xl font-bold">&times;</button>
+      <h2 className="text-2xl font-bold mb-4 text-blue-700">Gestión de Inscripciones - {sacramento?.nombre_sacrament}</h2>
 
       {/* Formulario */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xl border shadow mb-6">
         <div>
-          <label className="block font-medium">Persona:</label>
-          <select name="id_persona" className="input-form" value={formData.id_persona} onChange={handleChange} required>
-            <option value="">Seleccione una persona</option>
+          <label className="text-sm font-medium">Persona *</label>
+          <select name="id_persona" value={formData.id_persona} onChange={handleChange} className="input-form" required>
+            <option value="">Seleccione...</option>
             {personas.map(p => (
-              <option key={p.id_persona} value={p.id_persona}>{p.nombre_completo}</option>
+              <option key={p.id_persona} value={p.id_persona}>{p.nombre_completo} - {p.dni}</option>
             ))}
           </select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium">Fecha de Matrícula:</label>
-            <input type="date" name="fecha_matricula" className="input-form" value={formData.fecha_matricula} onChange={handleChange} />
-          </div>
-          <div>
-            <label className="block font-medium">Fecha de Ceremonia:</label>
-            <input type="date" name="fecha_ceremonia_acordada" className="input-form" value={formData.fecha_ceremonia_acordada} onChange={handleChange} />
-          </div>
+        <div>
+          <label className="text-sm font-medium">Fecha de inscripción *</label>
+          <input type="date" name="fecha_matricula" value={formData.fecha_matricula} onChange={handleChange} className="input-form" required />
         </div>
-
-        {mostrarEvaluacionOral && (
-          <div>
-            <label className="block font-medium">Evaluación Oral:</label>
-            <input type="text" name="evaluacion_oral" className="input-form" value={formData.evaluacion_oral} onChange={handleChange} />
-          </div>
-        )}
 
         <div>
-          <label className="block font-medium">Descripción:</label>
-          <textarea name="descripcion" className="input-form" value={formData.descripcion} onChange={handleChange}></textarea>
+          <label className="text-sm font-medium">Estado de matrícula</label>
+          <select name="estado_matricula" value={formData.estado_matricula} onChange={handleChange} className="input-form">
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+          </select>
         </div>
 
-        {esMatrimonio && (
-          <div className="bg-purple-50 p-4 rounded-2xl shadow-inner border border-purple-200">
-            <h3 className="text-lg font-semibold text-purple-700 mb-2">Datos de Matrimonio</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-medium">Cónyuge:</label>
-                <select name="id_persona_rol_conyuge" className="input-form" value={formData.id_persona_rol_conyuge} onChange={handleChange}>
-                  <option value="">Seleccione un cónyuge</option>
-                  {conyuges.map(p => (
-                    <option key={p.id_persona_rol} value={p.id_persona_rol}>{p.nombre_completo}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block font-medium">Tipo de Matrimonio:</label>
-                <input type="text" name="tipo_matrimonio" className="input-form" value={formData.tipo_matrimonio} onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block font-medium">Padrino:</label>
-                <select name="id_padrino" className="input-form" value={formData.id_padrino} onChange={handleChange}>
-                  <option value="">Seleccione padrino</option>
-                  {padrinos.map(p => (
-                    <option key={p.id_persona_rol} value={p.id_persona_rol}>{p.nombre_completo}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block font-medium">Madrina:</label>
-                <select name="id_madrina" className="input-form" value={formData.id_madrina} onChange={handleChange}>
-                  <option value="">Seleccione madrina</option>
-                  {madrinas.map(p => (
-                    <option key={p.id_persona_rol} value={p.id_persona_rol}>{p.nombre_completo}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block font-medium">Observaciones:</label>
-                <textarea name="observaciones_matrimonio" className="input-form" value={formData.observaciones_matrimonio} onChange={handleChange}></textarea>
-              </div>
-            </div>
+        <div className="md:col-span-2">
+          <label className="text-sm font-medium">Descripción</label>
+          <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} className="input-form" rows="2" />
+        </div>
+
+        {mostrarConyuge && (
+          <div>
+            <label className="text-sm font-medium">Cónyuge</label>
+            <select name="id_persona_rol_conyuge" value={formData.id_persona_rol_conyuge} onChange={handleChange} className="input-form">
+              <option value="">Seleccione...</option>
+              {conyuges.map(c => (
+                <option key={c.id_persona_rol} value={c.id_persona_rol}>{c.nombre_persona}</option>
+              ))}
+            </select>
           </div>
         )}
 
-        <div className="flex justify-end gap-3 pt-2">
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
+        {mostrarPadrinos && (
+          <>
+            <div>
+              <label className="text-sm font-medium">Padrino</label>
+              <select name="id_padrino" value={formData.id_padrino} onChange={handleChange} className="input-form">
+                <option value="">Seleccione...</option>
+                {padrinos.map(p => (
+                  <option key={p.id_persona_rol} value={p.id_persona_rol}>{p.nombre_persona}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Madrina</label>
+              <select name="id_madrina" value={formData.id_madrina} onChange={handleChange} className="input-form">
+                <option value="">Seleccione...</option>
+                {madrinas.map(m => (
+                  <option key={m.id_persona_rol} value={m.id_persona_rol}>{m.nombre_persona}</option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
+
+        {mostrarConyuge && (
+          <div className="md:col-span-2">
+            <label className="text-sm font-medium">Observaciones Matrimonio</label>
+            <textarea name="observaciones_matrimonio" value={formData.observaciones_matrimonio} onChange={handleChange} className="input-form" rows="2" />
+          </div>
+        )}
+
+        <div className="md:col-span-2 flex justify-end gap-3 mt-2">
+          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
             {editando ? 'Actualizar' : 'Registrar'}
           </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-          >
-            Cancelar
-          </button>
+          {editando && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditando(null);
+                setFormData({
+                  id_persona: '',
+                  fecha_matricula: '',
+                  descripcion: '',
+                  estado_matricula: 1,
+                  id_padrino: '',
+                  id_madrina: '',
+                  observaciones_matrimonio: '',
+                  id_sacramento: '',
+                  id_persona_rol_conyuge: ''
+                });
+              }}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+            >
+              Cancelar
+            </button>
+          )}
         </div>
       </form>
 
       {/* Tabla de inscripciones */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-blue-700 mb-2">Inscripciones Registradas</h3>
-        <div className="overflow-auto max-h-64 rounded-2xl border bg-white shadow-inner">
-          <table className="w-full table-auto text-sm text-center">
-            <thead className="bg-blue-600 text-white text-xs">
-              <tr>
-                <th className="px-2 py-2">Persona</th>
-                <th className="px-2 py-2">Fecha Matrícula</th>
-                <th className="px-2 py-2">Fecha Ceremonia</th>
-                {mostrarEvaluacionOral && <th className="px-2 py-2">Evaluación Oral</th>}
-                <th className="px-2 py-2">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inscripciones.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="text-center py-4 text-gray-500">No hay inscripciones registradas.</td>
+      <h3 className="text-lg font-semibold mb-2 text-blue-700">Inscripciones Registradas</h3>
+      <div className="overflow-x-auto rounded-2xl border shadow bg-white">
+        <table className="min-w-full text-sm text-center">
+          <thead className="bg-blue-600 text-white uppercase text-xs">
+            <tr>
+              <th className="py-3 px-2">Persona</th>
+              <th className="py-3 px-2">Fecha</th>
+              <th className="py-3 px-2">Estado</th>
+              <th className="py-3 px-2">Descripción</th>
+              {mostrarConyuge && <th className="py-3 px-2">Cónyuge</th>}
+              {mostrarPadrinos && <th className="py-3 px-2">Padrino</th>}
+              {mostrarPadrinos && <th className="py-3 px-2">Madrina</th>}
+              <th className="py-3 px-2">Precio</th>
+              <th className="py-3 px-2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inscripciones.length > 0 ? (
+              inscripciones.map(ins => (
+                <tr key={ins.id_inscripcion} className="hover:bg-gray-100 border-t">
+                  <td className="py-2 px-3">{ins.nombre_persona}</td>
+                  <td className="py-2 px-3">{ins.fecha_matricula}</td>
+                  <td className="py-2 px-3">
+                    <span className={`font-semibold ${ins.estado_matricula === 1 ? 'text-green-600' : 'text-red-600'}`}>
+                      {ins.estado_matricula === 1 ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="py-2 px-3">{ins.descripcion}</td>
+                  {mostrarConyuge && <td className="py-2 px-3">{ins.nombre_conyuge || '—'}</td>}
+                  {mostrarPadrinos && <td className="py-2 px-3">{ins.nombre_padrino || '—'}</td>}
+                  {mostrarPadrinos && <td className="py-2 px-3">{ins.nombre_madrina || '—'}</td>}
+                  <td className="py-2 px-3">
+                    {!isNaN(parseFloat(ins.precio_sacramento))
+                      ? `S/. ${parseFloat(ins.precio_sacramento).toFixed(2)}`
+                      : '—'}
+                  </td>
+                  <td className="py-2 px-3 flex justify-center gap-2">
+                    <button onClick={() => iniciarEdicion(ins)} className="text-yellow-600 hover:text-yellow-800 text-lg">
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                    <button onClick={() => eliminarInscripcion(ins.id_inscripcion)} className="text-red-600 hover:text-red-800 text-lg">
+                      <i className="bi bi-trash"></i>
+                    </button>
+                  </td>
                 </tr>
-              ) : (
-                inscripciones.map(ins => (
-                  <tr key={ins.id_inscripcion} className="hover:bg-gray-100">
-                    <td className="px-2 py-1">{ins.nombre_persona}</td>
-                    <td className="px-2 py-1">{ins.fecha_matricula?.split('T')[0]}</td>
-                    <td className="px-2 py-1">{ins.fecha_ceremonia_acordada?.split('T')[0]}</td>
-                    {mostrarEvaluacionOral && <td className="px-2 py-1">{ins.evaluacion_oral}</td>}
-                    <td className="px-2 py-1">
-                      <button onClick={() => iniciarEdicion(ins)} className="text-indigo-600 hover:text-indigo-800 text-lg">
-                        <i className="bi bi-pencil-square"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7 + (mostrarConyuge ? 1 : 0) + (mostrarPadrinos ? 2 : 0)} className="text-center py-4 text-gray-500">
+                  No hay inscripciones registradas
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 );
+
 
 }
 export default ModalGestionInscripcion;

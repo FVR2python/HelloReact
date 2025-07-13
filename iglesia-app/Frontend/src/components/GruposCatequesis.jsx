@@ -41,9 +41,17 @@ function GruposCatequesis() {
   };
 
   const obtenerSacramentos = async () => {
-    const res = await fetch('http://localhost:5000/sacramentos');
-    const data = await res.json();
-    setSacramentos(data);
+    try {
+      const res = await fetch('http://localhost:5000/sacramentos');
+      const data = await res.json();
+      const filtrados = data.filter(s => {
+        const nombre = s.nombre_sacrament.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, '');
+        return nombre.includes('primera comunion') || nombre.includes('confirmacion');
+      });
+      setSacramentos(filtrados);
+    } catch {
+      Swal.fire('Error', 'No se pudieron cargar los sacramentos', 'error');
+    }
   };
 
   const obtenerParroquias = async () => {
@@ -127,7 +135,7 @@ function GruposCatequesis() {
       }
     }
   };
-
+  
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-blue-600">Gestión de Grupos de Catequesis</h2>

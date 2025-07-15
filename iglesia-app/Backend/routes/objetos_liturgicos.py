@@ -3,6 +3,9 @@ from db.conexion import get_connection
 
 objetos_bp = Blueprint('objetos_bp', __name__)
 
+# ============================
+# GET - Listar objetos litúrgicos
+# ============================
 @objetos_bp.route('/objetos_liturgicos', methods=['GET'])
 def listar_objetos():
     try:
@@ -20,6 +23,25 @@ def listar_objetos():
     except Exception as e:
         return jsonify({"mensaje": f"Error al listar objetos: {str(e)}"}), 500
 
+# ============================
+# GET - Listar parroquias (para el <select>)
+# ============================
+@objetos_bp.route('/parroquias', methods=['GET'])
+def listar_parroquias():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id_parroquia, nombre_prrq FROM parroquias")
+        data = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"mensaje": f"Error al obtener parroquias: {str(e)}"}), 500
+
+# ============================
+# POST - Crear nuevo objeto litúrgico
+# ============================
 @objetos_bp.route('/objetos_liturgicos', methods=['POST'])
 def crear_objeto():
     data = request.get_json()
@@ -42,6 +64,9 @@ def crear_objeto():
     except Exception as e:
         return jsonify({"mensaje": f"Error al registrar objeto: {str(e)}"}), 500
 
+# ============================
+# PUT - Actualizar objeto litúrgico
+# ============================
 @objetos_bp.route('/objetos_liturgicos/<int:id_inventario>', methods=['PUT'])
 def actualizar_objeto(id_inventario):
     data = request.get_json()
@@ -65,6 +90,9 @@ def actualizar_objeto(id_inventario):
     except Exception as e:
         return jsonify({"mensaje": f"Error al actualizar objeto: {str(e)}"}), 500
 
+# ============================
+# DELETE - Eliminar objeto litúrgico
+# ============================
 @objetos_bp.route('/objetos_liturgicos/<int:id_inventario>', methods=['DELETE'])
 def eliminar_objeto(id_inventario):
     try:

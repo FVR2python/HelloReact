@@ -32,8 +32,9 @@ def listar_inscripciones():
             SELECT 
                 i.id_inscripcion,
                 i.estado_matricula,
-                DATE_FORMAT(i.fecha_matricula, '%%Y-%%m-%%d') AS fecha_matricula,
+                DATE_FORMAT(i.fecha_matricula, '%Y-%m-%d') AS fecha_matricula,
                 i.descripcion,
+                p.id_persona,
                 s.id_sacramento,
                 s.nombre_sacrament AS nombre_sacramento,
                 CONCAT(p.nombres, ' ', p.apellido1, ' ', IFNULL(p.apellido2, '')) AS nombre_persona,
@@ -139,6 +140,7 @@ def actualizar_inscripcion(id_inscripcion):
                 fecha_matricula = %s,
                 descripcion = %s,
                 id_sacramento = %s,
+                id_persona = %s,
                 id_persona_rol_conyuge = %s,
                 id_padrino = %s,
                 id_madrina = %s,
@@ -149,6 +151,7 @@ def actualizar_inscripcion(id_inscripcion):
             data.get('fecha_matricula'),
             data.get('descripcion', ''),
             data['id_sacramento'],
+            data['id_persona'],
             data.get('id_persona_rol_conyuge'),
             data.get('id_padrino'),
             data.get('id_madrina'),
@@ -208,18 +211,23 @@ def obtener_personas_por_rol(rol):
 # PERSONAS FILTRADAS POR SACRAMENTO
 # ===============================
 @inscripciones_bp.route('/personas-por-sacramento/<int:id_sacramento>', methods=['GET'])
-def obtener_personas_por_sacramento(id_sacramento):
+def obtener_personas_para_inscripcion(id_sacramento):
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT DISTINCT p.id_persona, 
+            SELECT 
+                p.id_persona, 
                 CONCAT(p.nombres, ' ', p.apellido1, ' ', IFNULL(p.apellido2, '')) AS nombre_completo, 
                 p.dni
             FROM personas p
-            JOIN inscripciones_sacramentales i ON p.id_persona = i.id_persona
-            WHERE i.id_sacramento = %s
-            ORDER BY p.nombres
+            WHERE p.estado = 1 
+               OR p.id_persona IN (
+                   SELECT id_persona 
+                   FROM inscripciones_sacramentales 
+                   WHERE id_sacramento = %s
+               )
+            ORDER BY p.nombres ASC
         """, (id_sacramento,))
         personas = cursor.fetchall()
         cursor.close()

@@ -88,19 +88,24 @@ function EventosSacramentales() {
     }
   };
 
-  const handleEditar = (e) => {
-    setFormData({
-      nombre_event: e.nombre_event,
-      fecha_event: e.fecha_event,
-      hora_inicio: e.hora_inicio,
-      hora_fin: e.hora_fin,
-      observacion: e.observacion,
-      id_parroquia: e.id_parroquia,
-      id_sacramento: e.id_sacramento,
-      id_clerigo: e.id_clerigo
-    });
-    setEditando(e.id_evento);
-  };
+const handleEditar = (e) => {
+  const fechaFormateada = e.fecha_event
+    ? new Date(e.fecha_event).toISOString().split('T')[0]
+    : '';
+
+  setFormData({
+    nombre_event: e.nombre_event,
+    fecha_event: fechaFormateada, // <- aquí el cambio
+    hora_inicio: e.hora_inicio,
+    hora_fin: e.hora_fin,
+    observacion: e.observacion,
+    id_parroquia: e.id_parroquia,
+    id_sacramento: e.id_sacramento,
+    id_clerigo: e.id_clerigo
+  });
+  setEditando(e.id_evento);
+};
+
 
   const handleEliminar = async (id) => {
     const result = await Swal.fire({

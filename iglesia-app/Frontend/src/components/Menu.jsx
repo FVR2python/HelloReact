@@ -107,6 +107,19 @@ function Menu({ usuario, setUsuario, showMenu = true, setShowMenu }) {
       ],
       visibleTo: ['administrador']
     },
+        {
+      label: 'Reportes del Sistema',
+      icon: 'bi-graph-up-arrow',
+      subItems: [
+        { label: 'Reporte de Sacramentos', path: '/reportes/sacramentos' },
+        { label: 'Reporte de Catequesis', path: '/reportes/catequesis' },
+        { label: 'Reporte de Celebraciones', path: '/reportes/celebraciones' },
+        { label: 'Reporte de Inventario', path: '/reportes/inventario' },
+        { label: 'Reporte de Tesorería', path: '/reportes/tesoreria' },
+        { label: 'Reporte de Auditoría', path: '/reportes/auditoria' }
+      ],
+      visibleTo: ['administrador', 'autoridad'] 
+    },
     {
       label: 'Configuración del Sistema',
       icon: 'bi-gear',
@@ -115,7 +128,11 @@ function Menu({ usuario, setUsuario, showMenu = true, setShowMenu }) {
         { label: 'Tipos de operación', path: '/config/tipos-transaccion' }
       ],
       visibleTo: ['administrador']
-    }
+    },
+
+
+    
+    
   ];
 
   const menuFiltrado = menuItems.filter(m => m.visibleTo.includes(cargo));

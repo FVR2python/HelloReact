@@ -44,6 +44,17 @@ import TiposTransacciones from './components/TiposTransacciones';
 import SacramentosPrecios from './components/SacramentosPrecios';
 
 
+//Reportes
+
+import ReporteSacramentos from './components/Reportes/ReporteSacramentos';
+import ReporteCatequesis from './components/Reportes/ReporteCatequesis';
+import ReporteCelebraciones from './components/Reportes/ReporteCelebraciones';
+import ReporteInventario from './components/Reportes/ReporteInventario';
+import ReporteTesoreria from './components/Reportes/ReporteTesoreria';
+import ReporteAuditoria from './components/Reportes/ReporteAuditoria';
+
+
+
 
 
 function App() {
@@ -108,6 +119,16 @@ function App() {
             <Route path="/admin/asignacion" element={<PersonasRoles />} />
             <Route path="/admin/clerigos" element={<Clerigos />} />
             <Route path="/admin/jerarquias" element={<Jerarquias />} />
+
+
+            {/* Reportes del sistema */}
+            <Route path="/Reportes/sacramentos" element={<ReporteSacramentos usuario={{ usuario }}/>} />
+            <Route path="/Reportes/catequesis" element={<ReporteCatequesis />} />
+            <Route path="/Reportes/celebraciones" element={<ReporteCelebraciones />} />
+            <Route path="/Reportes/inventario" element={<ReporteInventario />} />
+            <Route path="/Reportes/tesoreria" element={<ReporteTesoreria />} />
+            <Route path="/Reportes/auditoria" element={<ReporteAuditoria />} />
+
 
             {/* Configuración */}
             <Route path="/config/sacramentos" element={<SacramentosPrecios />} />
